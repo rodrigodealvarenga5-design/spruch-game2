@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spruch – Die Chroniken des Verzaubertwalds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --parchment-light: #f7f1e1;
+      --parchment-mid: #ebd9b4;
+      --parchment-dark: #d2ba89;
+      --wood-dark: #2c1e16;
+      --wood-mid: #4a3325;
+      --forest-deep: #1b2e25;
+      --forest-moss: #3b5a45;
+      --ink: #231912;
+      --orb-masc: #2980b9;   /* Blue: Masculine (der) */
+      --orb-fem: #d85c8a;    /* Pink: Feminine (die) */
+      --orb-neut: #2ecc71;   /* Green: Neuter (das) */
+      --spell-gold: #f3c65f;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--forest-deep);
+      background-image: 
+        radial-gradient(circle at 50% 35%, rgba(59, 90, 69, 0.45) 0%, rgba(20, 35, 28, 0.95) 80%),
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 8px);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* Storybook Page Container */
+    .storybook-frame {
+      width: 100%;
+      max-width: 1120px;
+      min-height: 94vh;
+      margin: 2vh auto;
+      background: radial-gradient(circle at center, var(--parchment-light) 0%, var(--parchment-mid) 75%, var(--parchment-dark) 100%);
+      border: 8px solid var(--wood-dark);
+      border-radius: 10px;
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.75),
+        inset 0 0 60px rgba(74, 51, 37, 0.35);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 28px;
+    }
+
+    /* Top HUD */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid rgba(74, 51, 37, 0.3);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hud-banner {
+      background: var(--parchment-mid);
+      border: 2px solid var(--wood-mid);
+      padding: 8px 16px;
+      border-radius: 4px;
+      box-shadow: 2px 3px 0 rgba(44, 30, 22, 0.25);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .game-title {
+      font-family: 'IM Fell English', serif;
+      font-size: 2.8rem;
+      margin: 0;
+      color: var(--wood-dark);
+      letter-spacing: 1px;
+      text-shadow: 1px 2px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .game-title .illuminated-s {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 3.6rem;
+      color: #6b2d1f;
+      vertical-align: -4px;
+    }
+
+    .progress-bar-wrap {
+      width: 180px;
+      height: 10px;
+      background: rgba(44, 30, 22, 0.2);
+      border: 1px solid var(--wood-mid);
+      border-radius: 5px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--forest-moss), #2e7d5b);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* Main Table Area */
+    .play-table {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: center;
+      margin: 18px 0;
+      flex: 1;
+    }
+
+    @media (max-width: 850px) {
+      .play-table {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Active Card Stage */
+    .card-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 430px;
+    }
+
+    .card-scene {
+      width: 290px;
+      height: 410px;
+      perspective: 1200px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.65s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transform-style: preserve-3d;
+    }
+
+    .card-scene.is-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      border: 3px solid var(--wood-dark);
+      background: radial-gradient(circle, #fbf6eb 0%, #e7d5b1 100%);
+      box-shadow: 0 12px 28px rgba(35, 25, 18, 0.35);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Botanical Vine Inner Border */
+    .vine-border {
+      border: 1.5px solid var(--wood-mid);
+      border-radius: 6px;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .vine-border::before,
+    .vine-border::after {
+      content: "❧";
+      position: absolute;
+      font-size: 1.5rem;
+      color: var(--wood-mid);
+      line-height: 1;
+    }
+    .vine-border::before { top: 4px; left: 8px; }
+    .vine-border::after { bottom: 4px; right: 8px; transform: rotate(180deg); }
+
+    /* Card Back - Ornate Illuminated S */
+    .card-back .illuminated-crest {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 7.5rem;
+      color: var(--wood-dark);
+      text-shadow: 2px 2px 0 var(--parchment-dark);
+      line-height: 1;
+      border: 2px double var(--wood-mid);
+      padding: 18px 34px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .card-back-hint {
+      font-style: italic;
+      font-size: 1.05rem;
+      margin-top: 14px;
+      color: var(--wood-mid);
+    }
+
+    /* Card Front */
+    .card-front {
+      transform: rotateY(180deg);
+    }
+
+    /* Top-Right Gender Magic Sphere */
+    .gender-sphere {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--wood-dark);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset -4px -4px 8px rgba(0,0,0,0.4), inset 4px 4px 10px rgba(255,255,255,0.7);
+      z-index: 5;
+      transition: transform 0.3s ease;
+    }
+    .sphere-masc { background: radial-gradient(circle at 35% 35%, #7ec8ff, var(--orb-masc) 60%, #103c5c 100%); }
+    .sphere-fem  { background: radial-gradient(circle at 35% 35%, #ff9ec4, var(--orb-fem) 60%, #6e183b 100%); }
+    .sphere-neut { background: radial-gradient(circle at 35% 35%, #8effc1, var(--orb-neut) 60%, #115c31 100%); }
+
+    .word-rank-badge {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      font-size: 0.9rem;
+      color: var(--wood-mid);
+      font-style: italic;
+    }
+
+    .sentence-de {
+      font-size: 1.65rem;
+      line-height: 1.4;
+      color: var(--ink);
+      margin: 16px 0 12px;
+    }
+
+    .missing-slot {
+      display: inline-block;
+      padding: 2px 10px;
+      border-bottom: 2px dashed var(--wood-mid);
+      font-weight: 700;
+      color: #4a3325;
+      transition: all 0.5s ease;
+    }
+
+    .missing-slot.revealed {
+      border-bottom: 2px solid transparent;
+      color: #134e32;
+      background: rgba(243, 198, 95, 0.35);
+      border-radius: 4px;
+      animation: spellFlash 0.8s ease-out;
+    }
+
+    @keyframes spellFlash {
+      0% { transform: scale(1.25); box-shadow: 0 0 25px var(--spell-gold); background: #fff8d6; }
+      100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+    }
+
+    .noun-base-box {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.4s ease;
+      background: rgba(74, 51, 37, 0.08);
+      border-top: 1px solid rgba(74, 51, 37, 0.25);
+      border-bottom: 1px solid rgba(74, 51, 37, 0.25);
+      padding: 8px 14px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .noun-base-box.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .noun-nominative {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--wood-dark);
+    }
+
+    .sentence-en {
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--wood-mid);
+      margin-top: 8px;
+    }
+
+    .tap-instruction {
+      font-size: 0.95rem;
+      color: var(--forest-moss);
+      font-style: italic;
+      margin-top: 12px;
+    }
+
+    /* SRS Evaluation Buttons */
+    .srs-controls {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .srs-controls.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn-storybook {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 9px 18px;
+      border: 2px solid var(--wood-dark);
+      border-radius: 5px;
+      cursor: pointer;
+      background: var(--parchment-light);
+      color: var(--ink);
+      box-shadow: 2px 3px 0 var(--wood-dark);
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .btn-storybook:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
+    .btn-storybook:active {
+      transform: translateY(1px);
+    }
+
+    .btn-again { border-color: #7a2828; color: #7a2828; }
+    .btn-good  { border-color: var(--forest-moss); color: var(--forest-deep); }
+    .btn-easy  { border-color: #1f507a; color: #1f507a; }
+
+    /* Right Side: Hand of 10 Cards + Legend */
+    .hand-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(74, 51, 37, 0.06);
+      border: 1.5px solid rgba(74, 51, 37, 0.25);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .hand-title {
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .ten-card-fan {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 18px;
+    }
+
+    .mini-card {
+      width: 46px;
+      height: 66px;
+      border: 2px solid var(--wood-dark);
+      border-radius: 5px;
+      background: var(--parchment-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--wood-dark);
+      box-shadow: 1px 2px 4px rgba(0,0,0,0.25);
+      transition: all 0.35s ease;
+      opacity: 0;
+      transform: translateY(-25px) scale(0.8);
+    }
+
+    .mini-card.dealt {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .mini-card.current {
+      border-color: #b5852b;
+      box-shadow: 0 0 12px var(--spell-gold);
+      transform: translateY(-6px) scale(1.08);
+      background: var(--parchment-light);
+    }
+
+    .mini-card.completed {
+      background: #d4e3d7;
+      color: var(--forest-moss);
+      border-color: var(--forest-moss);
+      opacity: 0.65;
+    }
+
+    .orb-legend {
+      width: 100%;
+      border-top: 1px solid rgba(74, 51, 37, 0.2);
+      padding-top: 12px;
+      font-size: 0.98rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--wood-dark);
+    }
+
+    /* Bottom Storybook Scroll Dialogue */
+    .dialogue-scroll {
+      background: linear-gradient(180deg, #f3e6c8 0%, #e5d1a7 100%);
+      border: 3px solid var(--wood-dark);
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: inset 0 0 18px rgba(74, 51, 37, 0.2), 0 6px 14px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .npc-portrait {
+      width: 78px;
+      height: 78px;
+      border-radius: 6px;
+      border: 2px solid var(--wood-dark);
+      background: var(--parchment-light);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .dialogue-content {
+      flex: 1;
+    }
+
+    .npc-name {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #5a271b;
+      margin-bottom: 4px;
+    }
+
+    .dialogue-text {
+      font-size: 1.15rem;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Name Input & Story Cutscene Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 24, 19, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      padding: 20px;
+    }
+
+    .modal-card {
+      max-width: 580px;
+      width: 100%;
+      background: var(--parchment-light);
+      border: 5px solid var(--wood-dark);
+      border-radius: 10px;
+      padding: 32px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    .name-input {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      padding: 10px 16px;
+      width: 80%;
+      border: 2px solid var(--wood-mid);
+      background: #fffdf7;
+      border-radius: 4px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Name Prompt Modal (Player is never shown, referred to by name) -->
+  <div id="nameModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="font-family:'IM Fell English',serif; font-size:2.2rem; margin-top:0;">Willkommen im Verzaubertwald</h2>
+      <p style="font-size:1.2rem; line-height:1.5;">
+        Du bist als Fremder in diesen alten Wald gereist, um die Geheimnisse der deutschen Sprache durch Immersion zu erlernen. Doch ein Schwarzbart-Magier hat die Worte gestohlen, um sie allein den Magiern vorzubehalten.
+      </p>
+      <p style="font-size:1.15rem; font-style:italic;">Wie lautet dein Name, Reisender?</p>
+      <input type="text" id="playerNameInput" class="name-input" placeholder="Dein Name..." maxlength="24" />
+      <br />
+      <button class="btn-storybook" onclick="startJourney()">Den Wald betreten</button>
+    </div>
+  </div>
+
+  <!-- Main Storybook Interface -->
+  <div class="storybook-frame">
+    <header>
+      <div class="hud-banner">
+        <div id="levelLabel">Stufe 1: Waldfremder</div>
+        <div style="font-size:0.9rem; font-weight:400;">
+          Reisender: <strong id="hudPlayerName">...</strong>
+        </div>
+        <div class="progress-bar-wrap" title="Fortschritt bis zur nächsten Stufe (alle 500 Wörter)">
+          <div id="levelProgressFill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <h1 class="game-title"><span class="illuminated-s">S</span>pruch</h1>
+
+      <div class="hud-banner" style="text-align:right;">
+        <div>Gelernte Wörter: <span id="learnedCount">0</span> / 5000</div>
+        <div style="font-size:0.9rem; font-weight:400; color:var(--forest-moss);">
+          Nächste Begegnung bei: <span id="nextStoryTarget">50</span> Wörtern
+        </div>
+      </div>
+    </header>
+
+    <!-- Center Card Table -->
+    <div class="play-table">
+      <div class="card-stage">
+        <div id="activeCard" class="card-scene" onclick="handleCardTouch()">
+          <div class="card-inner">
+            <!-- BACK OF CARD (Ornamental S) -->
+            <div class="card-face card-back">
+              <div class="vine-border">
+                <div class="illuminated-crest">S</div>
+                <div class="card-back-hint">Berühre die Karte, um sie aufzudecken</div>
+              </div>
+            </div>
+
+            <!-- FRONT OF CARD -->
+            <div class="card-face card-front">
+              <div id="genderSphere" class="gender-sphere sphere-masc" title="Wortgeschlecht"></div>
+              <div class="vine-border">
+                <span id="wordRank" class="word-rank-badge">#1</span>
+                <p id="sentenceDisplay" class="sentence-de"></p>
+                
+                <div id="nounRevealBox" class="noun-base-box">
+                  <div id="nominativeForm" class="noun-nominative"></div>
+                  <div id="englishTranslation" class="sentence-en"></div>
+                </div>
+
+                <div id="cardTapPrompt" class="tap-instruction">
+                  Berühre die Karte erneut für den Spruch-Zauber ✨
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Spaced Repetition Grading Buttons (Appear after 2nd touch) -->
+        <div id="srsButtons" class="srs-controls">
+          <button class="btn-storybook btn-again" onclick="gradeCard(0)">Noch mal (Schwer)</button>
+          <button class="btn-storybook btn-good" onclick="gradeCard(1)">Gut (Merken)</button>
+          <button class="btn-storybook btn-easy" onclick="gradeCard(2)">Gemeistert (Gelernt)</button>
+        </div>
+      </div>
+
+      <!-- Right Column: 10-Card Turn Hand & Gender Sphere Legend -->
+      <aside class="hand-panel">
+        <div class="hand-title">Aktuelle Runde (10 Karten)</div>
+        <div id="tenCardContainer" class="ten-card-fan"></div>
+
+        <button class="btn-storybook" style="width:100%; margin-bottom:14px; font-size:0.95rem;" onclick="triggerNextStoryPreview()">
+          Nächsten Story-Dialog testen (Alle 50 Wörter)
+        </button>
+
+        <div class="orb-legend">
+          <strong>Magische Sphären (Genus):</strong>
+          <div class="legend-row">
+            <span class="legend-dot sphere-masc"></span>
+            <span><strong>Blau:</strong> Maskulinum (der)</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-dot sphere-fem"></span>
+            <span><strong>Rosa:</strong> Femininum (die)</span>
+          </div>
+          <div class="legend-row">
+            <span class="legend-dot sphere-neut"></span>
+            <span><strong>Grün:</strong> Neutrum (das)</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Bottom Character Dialogue Scroll -->
+    <section class="dialogue-scroll">
+      <div id="npcPortrait" class="npc-portrait"></div>
+      <div class="dialogue-content">
+        <div id="npcName" class="npc-name">Blauer Magier</div>
+        <p id="npcDialogue" class="dialogue-text"></p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /*************************************************************************
+     * 1. LEVEL NAMES (10 Levels — 1 every 500 words learned)
+     * Replace these strings with your custom level names anytime!
+     *************************************************************************/
+    const LEVEL_NAMES = [
+      "Stufe 1: Waldfremder",           // 0 - 499 words
+      "Stufe 2: Silbensucher",          // 500 - 999 words
+      "Stufe 3:Spruchlehrling",         // 1000 - 1499 words
+      "Stufe 4: Wurzelleser",           // 1500 - 1999 words
+      "Stufe 5: Hüter der Nomen",       // 2000 - 2499 words
+      "Stufe 6: Nebelwanderer",         // 2500 - 2999 words
+      "Stufe 7: Freund der Wesen",      // 3000 - 3499 words
+      "Stufe 8: Meister der Sphären",   // 3500 - 3999 words
+      "Stufe 9: Bewahrer der Sprache",  // 4000 - 4499 words
+      "Stufe 10: Stimme des Verzaubertwalds" // 4500 - 5000 words
+    ];
+
+    /*************************************************************************
+     * 2. THE 11 CHARACTERS & LORE MILESTONES (Every 50 Learned Words)
+     *************************************************************************/
+    const CHARACTERS = {
+      blueMage:   { name: "Blauer Magier", color: "#2b5b84", icon: "🧙‍♂️" },
+      greyTroll:  { name: "Grauer Troll", color: "#5c6660", icon: "🧌" },
+      warrior:    { name: "Mächtiger Krieger", color: "#6e472b", icon: "⚔️" },
+      couple:     { name: "Fritz & Frida", color: "#4d6b45", icon: "👫" },
+      strongMan:  { name: "Starker Mann", color: "#703f28", icon: "🔨" },
+      heartyWoman:{ name: "Herzhafte Frau", color: "#8a4b38", icon: "🧺" },
+      thinMan:    { name: "Dünner Mann", color: "#5c5346", icon: "📜" },
+      fatMan:     { name: "Dicker Mann", color: "#7c6236", icon: "🍺" },
+      catLady:    { name: "Katzenfrau", color: "#4e463e", icon: "🐈" },
+      elf:        { name: "Elf", color: "#2e5c38", icon: "🏹" },
+      blackMage:  { name: "Schwarzbart-Magier", color: "#222026", icon: "🪄" }
+    };
+
+    const STORY_EVENTS = [
+      {
+        words: 0,
+        char: "blueMage",
+        text: "Willkommen im Verzaubertwald, {player}! Der Schwarzbart-Magier stiehlt die deutschen Hauptwörter aus dem Gedächtnis der Menschen. Jedes Wort, das du lernst, bricht seine dunkle Macht!"
+      },
+      {
+        words: 50,
+        char: "greyTroll",
+        text: "Grrr... {player}! Früher konnte ich die Bäume und Steine beim Namen nennen. Dank deiner ersten 50 Wörter kehrt meine Stimme langsam zurück."
+      },
+      {
+        words: 100,
+        char: "couple",
+        text: "Schau nur, Fritz! {player} hat schon 100 Wörter befreit! Bald können wir im Dorf wieder Lieder singen, ohne dass uns die Begriffe fehlen."
+      },
+      {
+        words: 150,
+        char: "warrior",
+        text: "Mein Schwert ist scharf, {player}, doch gegen den Sprachfluch des Schwarzbart-Magiers helfen nur deine Spruch-Karten!"
+      },
+      {
+        words: 200,
+        char: "heartyWoman",
+        text: "Komm her, {player}! Ich habe frisches Brot im Korb. Der Schwarzbart-Magier wird immer blasser, je mehr Wörter du meisterst!"
+      },
+      {
+        words: 250,
+        char: "strongMan",
+        text: "Selbst mein schwerer Schmiedehammer konnte den Fluch nicht brechen, {player}. Doch deine Worte lassen den Amboss wieder klingen!"
+      },
+      {
+        words: 300,
+        char: "thinMan",
+        text: "Ich habe es auf meiner Karte verzeichnet, {player}: Der Turm des Schwarzbart-Magiers verliert seine Schatten!"
+      },
+      {
+        words: 350,
+        char: "fatMan",
+        text: "Prost, {player}! Auf deine Wortkunst! Was nützt ein volles Wirtshaus, wenn niemand mehr die Dinge beim Namen nennen kann?"
+      },
+      {
+        words: 400,
+        char: "catLady",
+        text: "Meine Katzen schnurren wieder, {player}. Sie spüren, dass der Schwarzbart-Magier schwächer wird, weil du die Sprache mit allen teilst."
+      },
+      {
+        words: 450,
+        char: "elf",
+        text: "Die Blätter des Verzaubertwalds flüstern deinen Namen, {player}. Noch nie hat ein Fremder unsere Sprache so schnell verinnerlicht."
+      },
+      {
+        words: 500,
+        char: "blackMage",
+        text: "Unmöglich, {player}! Diese edle Sprache sollte allein uns Magiern gehören... Warum schwindet meine Kraft mit jedem Wort, das du lernst?!"
+      },
+      {
+        words: 5000,
+        char: "blackMage",
+        text: "Ich... ich habe keine Kraft mehr, {player}. Du hast alle 5000 Wörter befreit und mir dennoch das Leben geschenkt. Verzeih mir – lass uns gemeinsam im Verzaubertwald feiern!"
+      }
+    ];
+
+    /*************************************************************************
+     * 3. STARTER HIGH-FREQUENCY GERMAN NOUNS (Ordered most common -> less common)
+     * All nouns are presented in their standard Nominative singular form.
+     * Automatically loads `words_5000.json` if present in the same folder.
+     *************************************************************************/
+    let WORD_DATABASE = [
+      { rank: 1,  article: "das", noun: "Jahr",      gender: "neut", sentence: "Das neue [___] beginnt mit viel Hoffnung.", en: "The new [year] begins with much hope." },
+      { rank: 2,  article: "das", noun: "Mal",       gender: "neut", sentence: "Zum ersten [___] betrittst du den alten Wald.", en: "For the first [time] you enter the old forest." },
+      { rank: 3,  article: "das", noun: "Beispiel",  gender: "neut", sentence: "Der Magier nennt ein einfaches [___].", en: "The mage gives a simple [example]." },
+      { rank: 4,  article: "die", noun: "Zeit",      gender: "fem",  sentence: "Die [___] heilt alle Wunden im Verzaubertwald.", en: "[Time] heals all wounds in the enchanted forest." },
+      { rank: 5,  article: "die", noun: "Frau",      gender: "fem",  sentence: "Die freundliche [___] trägt einen Korb.", en: "The friendly [woman] carries a basket." },
+      { rank: 6,  article: "der", noun: "Mensch",    gender: "masc", sentence: "Jeder [___] im Dorf braucht die Sprache.", en: "Every [human/person] in the village needs language." },
+      { rank: 7,  article: "das", noun: "Kind",      gender: "neut", sentence: "Das kleine [___] lacht unter der Eiche.", en: "The little [child] laughs under the oak tree." },
+      { rank: 8,  article: "der", noun: "Tag",       gender: "masc", sentence: "Ein neuer [___] bricht über den Bäumen an.", en: "A new [day] dawns above the trees." },
+      { rank: 9,  article: "der", noun: "Mann",      gender: "masc", sentence: "Der starke [___] steht in seiner Schmiede.", en: "The strong [man] stands in his smithy." },
+      { rank: 10, article: "das", noun: "Land",      gender: "neut", sentence: "Dieses weite [___] ist voller alter Magie.", en: "This wide [land/country] is full of old magic." },
+      { rank: 11, article: "die", noun: "Frage",     gender: "fem",  sentence: "Deine kluge [___] überrascht den Magier.", en: "Your clever [question] surprises the mage." },
+      { rank: 12, article: "das", noun: "Haus",      gender: "neut", sentence: "Das alte [___] aus Holz steht am Waldrand.", en: "The old wooden [house] stands at the forest edge." },
+      { rank: 13, article: "der", noun: "Fall",      gender: "masc", sentence: "Auf jeden [___] wirst du den Zauber brechen.", en: "In any [case], you will break the spell." },
+      { rank: 14, article: "die", noun: "Arbeit",    gender: "fem",  sentence: "Nach der harten [___] ruht der Schmied.", en: "After the hard [work], the blacksmith rests." },
+      { rank: 15, article: "die", noun: "Hand",      gender: "fem",  sentence: "Die offene [___] hält zehn Spruch-Karten.", en: "The open [hand] holds ten spell cards." },
+      { rank: 16, article: "die", noun: "Stadt",     gender: "fem",  sentence: "Fern vom Wald liegt eine große [___].", en: "Far from the forest lies a large [city]." },
+      { rank: 17, article: "der", noun: "Teil",      gender: "masc", sentence: "Dieser dunkle [___] des Waldes ist geheimnisvoll.", en: "This dark [part] of the forest is mysterious." },
+      { rank: 18, article: "das", noun: "Problem",   gender: "neut", sentence: "Gemeinsam lösen wir jedes [___].", en: "Together we solve every [problem]." },
+      { rank: 19, article: "die", noun: "Welt",      gender: "fem",  sentence: "Die ganze [___] lauscht deinen Worten.", en: "The whole [world] listens to your words." },
+      { rank: 20, article: "das", noun: "Recht",     gender: "neut", sentence: "Jeder hat das [___], frei zu sprechen.", en: "Everyone has the [right] to speak freely." }
+    ];
+
+    /*************************************************************************
+     * 4. GAME STATE & SPACED REPETITION ENGINE
+     *************************************************************************/
+    let gameState = {
+      playerName: "",
+      srsData: {},         // rank -> { interval, repetitions, learned }
+      learnedWordsCount: 0,
+      storyIndex: 0
+    };
+
+    let currentHand = [];  // 10 cards per turn
+    let handIndex = 0;
+    let cardTouchState = 0; // 0 = face down, 1 = flipped (sentence), 2 = spell cast (word revealed)
+
+    // Load external 5,000 word list if present in repository
+    async function tryLoadFullDatabase() {
+      try {
+        const res = await fetch("words_5000.json");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            WORD_DATABASE = data;
+          }
+        }
+      } catch (e) {
+        // Uses built-in starter deck when running locally without a server
+      }
+    }
+
+    function loadProgress() {
+      const saved = localStorage.getItem("spruch_save_v1");
+      if (saved) {
+        gameState = JSON.parse(saved);
+        if (gameState.playerName) {
+          document.getElementById("nameModal").classList.add("hidden");
+          initSession();
+        }
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem("spruch_save_v1", JSON.stringify(gameState));
+    }
+
+    function startJourney() {
+      const input = document.getElementById("playerNameInput").value.trim();
+      gameState.playerName = input || "Wanderer";
+      document.getElementById("nameModal").classList.add("hidden");
+      saveProgress();
+      initSession();
+    }
+
+    function initSession() {
+      updateHUD();
+      showStoryEvent(STORY_EVENTS[0]);
+      dealNewTurnOfTenCards();
+    }
+
+    function updateHUD() {
+      document.getElementById("hudPlayerName").textContent = gameState.playerName;
+      document.getElementById("learnedCount").textContent = gameState.learnedWordsCount;
+
+      const levelIdx = Math.min(9, Math.floor(gameState.learnedWordsCount / 500));
+      document.getElementById("levelLabel").textContent = LEVEL_NAMES[levelIdx];
+
+      const progressWithinLevel = ((gameState.learnedWordsCount % 500) / 500) * 100;
+      document.getElementById("levelProgressFill").style.width = `${progressWithinLevel}%`;
+
+      const nextMilestone = (Math.floor(gameState.learnedWordsCount / 50) + 1) * 50;
+      document.getElementById("nextStoryTarget").textContent = Math.min(5000, nextMilestone);
+    }
+
+    // Select 10 cards prioritizing due SRS reviews, then unseen words in frequency order
+    function dealNewTurnOfTenCards() {
+      const now = Date.now();
+      const dueCards = [];
+      const newCards = [];
+
+      for (const word of WORD_DATABASE) {
+        const srs = gameState.srsData[word.rank];
+        if (!srs) {
+          newCards.push(word);
+        } else if (!srs.learned || srs.nextReview <= now) {
+          dueCards.push(word);
+        }
+      }
+
+      currentHand = [...dueCards, ...newCards].slice(0, 10);
+      if (currentHand.length < 10) {
+        currentHand = WORD_DATABASE.slice(0, 10);
+      }
+
+      handIndex = 0;
+      renderTenCardHandAnimation();
+      prepareCardOnStage();
+    }
+
+    function renderTenCardHandAnimation() {
+      const container = document.getElementById("tenCardContainer");
+      container.innerHTML = "";
+
+      currentHand.forEach((card, idx) => {
+        const mini = document.createElement("div");
+        mini.className = "mini-card";
+        mini.id = `mini-card-${idx}`;
+        mini.textContent = "S";
+        container.appendChild(mini);
+
+        // Dealing animation: 10 cards handed out one after another
+        setTimeout(() => {
+          mini.classList.add("dealt");
+          if (idx === handIndex) mini.classList.add("current");
+        }, idx * 90);
+      });
+    }
+
+    function updateMiniCardsHighlight() {
+      currentHand.forEach((_, idx) => {
+        const el = document.getElementById(`mini-card-${idx}`);
+        if (!el) return;
+        el.classList.remove("current", "completed");
+        if (idx < handIndex) el.classList.add("completed");
+        if (idx === handIndex) el.classList.add("current");
+      });
+    }
+
+    function prepareCardOnStage() {
+      cardTouchState = 0;
+      const cardScene = document.getElementById("activeCard");
+      cardScene.classList.remove("is-flipped");
+      document.getElementById("srsButtons").classList.remove("active");
+      document.getElementById("nounRevealBox").classList.remove("visible");
+
+      const wordObj = currentHand[handIndex];
+      if (!wordObj) return;
+
+      // Wait briefly if flipping back so content doesn't flash
+      setTimeout(() => {
+        document.getElementById("wordRank").textContent = `Wort #${wordObj.rank}`;
+
+        // Set Gender Sphere (Blue = masc, Pink = fem, Green = neut)
+        const sphere = document.getElementById("genderSphere");
+        sphere.className = "gender-sphere";
+        if (wordObj.gender === "masc") sphere.classList.add("sphere-masc");
+        else if (wordObj.gender === "fem") sphere.classList.add("sphere-fem");
+        else sphere.classList.add("sphere-neut");
+
+        // Sentence with missing word slot
+        const sentenceHTML = wordObj.sentence.replace(
+          "[___]",
+          `<span id="missingWordSlot" class="missing-slot">[ ___ ]</span>`
+        );
+        document.getElementById("sentenceDisplay").innerHTML = sentenceHTML;
+        document.getElementById("nominativeForm").textContent = `${wordObj.article} ${wordObj.noun}`;
+        document.getElementById("englishTranslation").textContent = wordObj.en;
+        document.getElementById("cardTapPrompt").textContent = "Berühre die Karte erneut für den Spruch-Zauber ✨";
+      }, 220);
+
+      updateMiniCardsHighlight();
+    }
+
+    // Two-Touch Card Interaction
+    function handleCardTouch() {
+      const wordObj = currentHand[handIndex];
+      if (!wordObj) return;
+
+      // Touch 1: Turn card facewards, revealing sentence with missing word & gender sphere
+      if (cardTouchState === 0) {
+        cardTouchState = 1;
+        document.getElementById("activeCard").classList.add("is-flipped");
+        return;
+      }
+
+      // Touch 2: Cast spell animation, reveal the missing standard noun & show SRS buttons
+      if (cardTouchState === 1) {
+        cardTouchState = 2;
+        const slot = document.getElementById("missingWordSlot");
+        if (slot) {
+          slot.textContent = wordObj.noun;
+          slot.classList.add("revealed");
+        }
+        document.getElementById("nounRevealBox").classList.add("visible");
+        document.getElementById("cardTapPrompt").textContent = "Wie gut kanntest du dieses Wort?";
+        document.getElementById("srsButtons").classList.add("active");
+      }
+    }
+
+    // Spaced Repetition Evaluation
+    function gradeCard(grade) {
+      const wordObj = currentHand[handIndex];
+      const prev = gameState.srsData[wordObj.rank] || { repetitions: 0, interval: 1, learned: false };
+
+      if (grade === 0) {
+        // Again: Re-queue in current hand so the player truly learns it this turn
+        prev.repetitions = 0;
+        prev.interval = 1;
+        currentHand.push(wordObj);
+      } else if (grade === 1) {
+        // Good
+        prev.repetitions += 1;
+        prev.interval = prev.repetitions === 1 ? 1 : prev.interval * 2;
+        if (prev.repetitions >= 2 && !prev.learned) {
+          markWordLearned(prev);
+        }
+      } else if (grade === 2) {
+        // Mastered
+        prev.repetitions += 2;
+        prev.interval = prev.interval * 3;
+        if (!prev.learned) {
+          markWordLearned(prev);
+        }
+      }
+
+      prev.nextReview = Date.now() + prev.interval * 60 * 1000;
+      gameState.srsData[wordObj.rank] = prev;
+      saveProgress();
+      updateHUD();
+
+      // Move to next card in the 10-card hand, or deal a new hand of 10
+      handIndex++;
+      if (handIndex < currentHand.length) {
+        prepareCardOnStage();
+      } else {
+        setTimeout(() => dealNewTurnOfTenCards(), 500);
+      }
+    }
+
+    function markWordLearned(srsRecord) {
+      srsRecord.learned = true;
+      gameState.learnedWordsCount += 1;
+
+      // Trigger story dialogue every 50 learned words
+      if (gameState.learnedWordsCount % 50 === 0) {
+        const milestoneEvent = STORY_EVENTS.find(e => e.words === gameState.learnedWordsCount);
+        if (milestoneEvent) {
+          showStoryEvent(milestoneEvent);
+        } else {
+          triggerNextStoryPreview();
+        }
+      }
+    }
+
+    function showStoryEvent(eventObj) {
+      const charInfo = CHARACTERS[eventObj.char];
+      const portraitEl = document.getElementById("npcPortrait");
+      portraitEl.style.background = `radial-gradient(circle, #fbf5e6 0%, ${charInfo.color}33 100%)`;
+      portraitEl.innerHTML = `<span style="font-size:2.6rem;">${charInfo.icon}</span>`;
+
+      document.getElementById("npcName").textContent = charInfo.name;
+      document.getElementById("npcDialogue").textContent = eventObj.text.replace(/\{player\}/g, gameState.playerName || "Wanderer");
+    }
+
+    function triggerNextStoryPreview() {
+      gameState.storyIndex = (gameState.storyIndex + 1) % STORY_EVENTS.length;
+      showStoryEvent(STORY_EVENTS[gameState.storyIndex]);
+    }
+
+    // Boot Game
+    tryLoadFullDatabase().then(loadProgress);
+  </script>
+</body>
+</html>
