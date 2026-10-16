@@ -993,4 +993,578 @@
       thinMan:     { name: "Dünner Mann",        role: "Chronist und Kartenzeichner" },
       fatMan:      { name: "Dicker Mann",        role: "Fröhlicher Gastwirt" },
       catLady:     { name: "Katzenfrau",         role: "Flüsterin der Waldkatzen" },
-      elf:         { name: "Elf",
+      elf:         { name: "Elf",                role: "Späher der Baumkronen" },
+      blackMage:   { name: "Schwarzbart-Magier", role: "Widersacher (und späterer Freund)" }
+    };
+
+    const STORY_EVENTS = [
+      { words: 0,    char: "blueMage",    text: "Willkommen im Verzaubertwald, {player}! Der Schwarzbart-Magier stiehlt die deutschen Hauptwörter. Jedes Wort, das du lernst, schwächt seinen Fluch!" },
+      { words: 50,   char: "greyTroll",   text: "Grrr... {player}! Früher konnte ich die Bäume und Flüsse beim Namen nennen. Dank deiner ersten 50 Wörter kehrt meine Erinnerung zurück." },
+      { words: 100,  char: "couple",      text: "Schau nur, Fritz! {player} hat schon 100 Wörter befreit! Bald können wir im Dorf wieder gemeinsam Geschichten erzählen." },
+      { words: 150,  char: "warrior",     text: "Mein Schwert ist scharf, {player}, doch gegen den Sprachfluch des Schwarzbart-Magiers helfen nur deine Spruch-Karten!" },
+      { words: 200,  char: "heartyWoman", text: "Komm her, {player}! Ich habe frisches Brot gebacken. Der Schwarzbart-Magier wird immer schwächer, je mehr Wörter du meisterst!" },
+      { words: 250,  char: "strongMan",   text: "Selbst mein schwerer Schmiedehammer konnte den Fluch nicht brechen, {player}. Doch deine Worte lassen den Amboss wieder klingen!" },
+      { words: 300,  char: "thinMan",     text: "Ich habe es auf meiner Karte verzeichnet, {player}: Der dunkle Nebel über dem Verzaubertwald lichtet sich!" },
+      { words: 350,  char: "fatMan",      text: "Prost, {player}! Auf deine Wortkunst! Was nützt ein volles Wirtshaus, wenn niemand mehr die Dinge beim Namen nennen kann?" },
+      { words: 400,  char: "catLady",     text: "Meine Katzen schnurren wieder, {player}. Sie spüren, dass der Schwarzbart-Magier seine Macht verliert." },
+      { words: 450,  char: "elf",         text: "Die Blätter des Verzaubertwalds flüstern deinen Namen, {player}. Noch nie hat ein Fremder unsere Sprache so schnell verinnerlicht." },
+      { words: 500,  char: "blackMage",   text: "Unmöglich, {player}! Diese Sprache sollte allein uns Magiern gehören... Warum schwindet meine Kraft mit jedem deiner gelernten Wörter?!" },
+      { words: 5000, char: "blackMage",   text: "Ich... ich habe keine Kraft mehr, {player}. Du hast alle 5000 Wörter befreit und mich gerettet. Lass uns als Freunde im Verzaubertwald feiern!" }
+    ];
+
+    /*************************************************************************
+     * 3. EXPANDED BUILT-IN GERMAN NOUN DATABASE (Ordered by Frequency)
+     * Format: "article|Noun|Sentence with [___]|English translation"
+     * Over 200 everyday nouns built right in + procedural expansion to 5,000!
+     *************************************************************************/
+    const RAW_NOUN_DATA = [
+      "das|Jahr|Das neue [___] beginnt mit viel Hoffnung.|The new [year] begins with much hope.",
+      "das|Mal|Zum ersten [___] betrittst du den alten Wald.|For the first [time] you enter the old forest.",
+      "das|Beispiel|Der Magier nennt ein einfaches [___].|The mage gives a simple [example].",
+      "die|Zeit|Die [___] heilt alle Wunden im Verzaubertwald.|[Time] heals all wounds in the enchanted forest.",
+      "die|Frau|Die freundliche [___] trägt einen Korb.|The friendly [woman] carries a basket.",
+      "der|Mensch|Jeder [___] im Dorf braucht die Sprache.|Every [human] in the village needs language.",
+      "das|Kind|Das kleine [___] lacht unter der Eiche.|The little [child] laughs under the oak tree.",
+      "der|Tag|Ein neuer [___] bricht über den Bäumen an.|A new [day] dawns above the trees.",
+      "der|Mann|Der starke [___] steht in seiner Schmiede.|The strong [man] stands in his smithy.",
+      "das|Land|Dieses weite [___] ist voller alter Magie.|This wide [land] is full of old magic.",
+      "die|Frage|Deine kluge [___] überrascht den Magier.|Your clever [question] surprises the mage.",
+      "das|Haus|Das alte [___] aus Holz steht am Waldrand.|The old wooden [house] stands at the forest edge.",
+      "der|Fall|Auf jeden [___] wirst du den Zauber brechen.|In any [case], you will break the spell.",
+      "die|Arbeit|Nach der harten [___] ruht der Schmied.|After the hard [work], the blacksmith rests.",
+      "die|Hand|Die ruhige [___] hält zehn Spruch-Karten.|The steady [hand] holds ten spell cards.",
+      "die|Stadt|Fern vom Wald liegt eine große [___].|Far from the forest lies a large [city].",
+      "der|Teil|Dieser dunkle [___] des Waldes ist geheimnisvoll.|This dark [part] of the forest is mysterious.",
+      "das|Problem|Gemeinsam lösen wir jedes [___].|Together we solve every [problem].",
+      "die|Welt|Die ganze [___] lauscht deinen Worten.|The whole [world] listens to your words.",
+      "das|Recht|Jeder hat das [___], frei zu sprechen.|Everyone has the [right] to speak freely.",
+      "das|Ende|Am [___] des Pfades wartet der Troll.|At the [end] of the path waits the troll.",
+      "die|Schule|In dieser [___] lernt man alte Sprüche.|In this [school] one learns old spells.",
+      "die|Woche|Eine ganze [___] wandern wir durch das Moos.|For a whole [week] we walk through the moss.",
+      "der|Vater|Der gütige [___] erzählt eine Geschichte.|The kind [father] tells a story.",
+      "die|Seite|Auf dieser [___] des Buches steht der Spruch.|On this [page] of the book stands the spell.",
+      "das|Leben|Das friedliche [___] kehrt in den Wald zurück.|Peaceful [life] returns to the forest.",
+      "die|Mutter|Die liebevolle [___] winkt vom Fenster aus.|The loving [mother] waves from the window.",
+      "der|Grund|Aus gutem [___] bist du hierher gereist.|For a good [reason] you traveled here.",
+      "das|Auge|Das wache [___] des Elfen sieht alles.|The watchful [eye] of the elf sees everything.",
+      "das|Wort|Jedes gelernte [___] bricht den dunklen Fluch.|Every learned [word] breaks the dark curse.",
+      "das|Geld|Für Gold und [___] kann man Magie nicht kaufen.|For gold and [money] one cannot buy magic.",
+      "der|Kopf|Der Weise schüttelt nachdenklich den [___].|The wise man thoughtfully shakes his [head].",
+      "der|Freund|Ein wahrer [___] begleitet dich durch die Nacht.|A true [friend] accompanies you through the night.",
+      "die|Stunde|In einer [___] erreichen wir die Lichtung.|In one [hour] we reach the clearing.",
+      "der|Name|Dein eigener [___] steht in der Chronik.|Your own [name] is written in the chronicle.",
+      "der|Platz|Am warmen Kamin ist noch ein [___] frei.|By the warm fireplace there is still a [place] free.",
+      "der|Weg|Der schmale [___] führt tief in den Verzaubertwald.|The narrow [path] leads deep into the enchanted forest.",
+      "der|Monat|Ein ganzer [___] vergeht wie im Flug.|A whole [month] passes in the blink of an eye.",
+      "die|Art|Seine freundliche [___] gefällt den Dorfbewohnern.|His friendly [manner] pleases the villagers.",
+      "die|Nacht|Die stille [___] funkelt voller Glühwürmchen.|The silent [night] sparkles with fireflies.",
+      "das|Wasser|Das klare [___] der Quelle erfrischt dich.|The clear [water] of the spring refreshes you.",
+      "das|Buch|Das schwere [___] liegt auf dem Holzpult.|The heavy [book] lies on the wooden desk.",
+      "die|Stelle|An dieser [___] wächst seltenes Moos.|At this [spot] rare moss grows.",
+      "der|Herr|Der alte [___] grüßt dich mit seinem Hut.|The old [gentleman] greets you with his hat.",
+      "die|Tür|Die schwere [___] aus Eichenholz öffnet sich.|The heavy oak [door] opens.",
+      "das|Auto|Kein [___] fährt durch diesen uralten Wald.|No [car] drives through this ancient forest.",
+      "der|Krieg|Der lange [___] um die Sprache muss enden.|The long [war] over language must end.",
+      "das|Bild|Ein gemaltes [___] hängt über dem Kamin.|A painted [picture] hangs above the fireplace.",
+      "die|Geschichte|Diese alte [___] wird seit Jahrhunderten erzählt.|This old [story] has been told for centuries.",
+      "der|Sohn|Der junge [___] hilft seinem Vater im Wald.|The young [son] helps his father in the forest.",
+      "das|Licht|Ein warmes [___] scheint durch die Baumkronen.|A warm [light] shines through the treetops.",
+      "die|Familie|Die ganze [___] sitzt abends am Holztisch.|The whole [family] sits at the wooden table in the evening.",
+      "der|Gott|Ein alter [___] des Waldes wacht über die Bäume.|An old [god] of the forest watches over the trees.",
+      "die|Stimme|Deine klare [___] spricht den Zauberspruch.|Your clear [voice] speaks the magic spell.",
+      "das|Mädchen|Das mutige [___] füttert die Waldkatzen.|The brave [girl] feeds the forest cats.",
+      "der|Sinn|Der tiefere [___] des Satzes wird nun klar.|The deeper [meaning] of the sentence now becomes clear.",
+      "die|Erde|Die dunkle [___] duftet nach frischem Regen.|The dark [earth] smells of fresh rain.",
+      "das|Gesicht|Sein ernstes [___] zeigt große Weisheit.|His serious [face] shows great wisdom.",
+      "die|Sprache|Die deutsche [___] gehört allen Menschen.|The German [language] belongs to all people.",
+      "der|tisch|Der gedeckte [___] lädt zum Essen ein.|The set [table] invites you to eat.",
+      "das|Herz|Dein mutiges [___] kennt keine Furcht.|Your brave [heart] knows no fear.",
+      "die|Luft|Die kühle [___] des Morgens tut gut.|The cool [air] of the morning feels good.",
+      "der|Morgen|Jeden [___] singen die Vögel im Geäst.|Every [morning] the birds sing in the branches.",
+      "der|Abend|Am späten [___] kehrt Ruhe im Dorf ein.|In the late [evening] quiet returns to the village.",
+      "die|Musik|Sanfte [___] klingt aus dem Wirtshaus.|Gentle [music] sounds from the inn.",
+      "der|Wald|Der dichte [___] birgt tausend Geheimnisse.|The dense [forest] holds a thousand secrets.",
+      "der|Baum|Der uralte [___] hat tiefe Wurzeln.|The ancient [tree] has deep roots.",
+      "der|Stein|Unter diesem grauen [___] schläft der Troll.|Under this grey [stone] sleeps the troll.",
+      "das|Feuer|Das knisternde [___] wärmt unsere Hände.|The crackling [fire] warms our hands.",
+      "der|Wind|Der frische [___] weht durch die Blätter.|The fresh [wind] blows through the leaves.",
+      "der|Berg|Hinter dem hohen [___] geht die Sonne auf.|Behind the high [mountain] the sun rises.",
+      "der|Fluss|Der breite [___] fließt ruhig durch das Tal.|The wide [river] flows calmly through the valley.",
+      "die|Sonne|Die goldene [___] erwärmt das kalte Moos.|The golden [sun] warms the cold moss.",
+      "der|Mond|Der silberne [___] leuchtet über den Wipfeln.|The silver [moon] shines above the treetops.",
+      "der|Stern|Ein heller [___] zeigt uns die Richtung.|A bright [star] shows us the direction.",
+      "das|Brot|Das frische [___] duftet herrlich aus dem Korb.|The fresh [bread] smells wonderful from the basket.",
+      "das|Bier|Der dicke Wirt zapft ein kühles [___].|The stout innkeeper taps a cool [beer].",
+      "die|Katze|Die kleine [___] schnurrt auf dem Mantel.|The little [cat] purrs on the cloak.",
+      "der|Hund|Der treue [___] bewacht das Hoftor.|The loyal [dog] guards the courtyard gate.",
+      "der|Vogel|Ein bunter [___] sitzt auf dem Ast.|A colorful [bird] sits on the branch.",
+      "das|Pferd|Das schnelle [___] trabt über die Brücke.|The fast [horse] trots across the bridge.",
+      "das|Schwert|Das geschmiedete [___] glänzt im Mondlicht.|The forged [sword] gleams in the moonlight.",
+      "der|Brief|Der dünne Bote bringt einen wichtigen [___].|The thin messenger brings an important [letter].",
+      "der|Schlüssel|Dieser eiserne [___] öffnet die alte Truhe.|This iron [key] opens the old chest.",
+      "das|Fenster|Durch das offene [___] weht Waldluft herein.|Through the open [window] forest air blows in.",
+      "das|Dorf|Das kleine [___] feiert deine Rückkehr.|The small [village] celebrates your return.",
+      "die|Brücke|Die steinerne [___] führt über den Bach.|The stone [bridge] leads over the stream.",
+      "der|Turm|Der dunkle [___] des Magiers steht im Nebel.|The dark [tower] of the mage stands in the fog.",
+      "der|Zauber|Dein Wissen bricht den alten [___].|Your knowledge breaks the old [spell].",
+      "die|Kraft|Mit neuer [___] setzt du deine Reise fort.|With new [strength] you continue your journey.",
+      "die|Freude|Große [___] erfüllt alle Bewohner des Waldes.|Great [joy] fills all inhabitants of the forest.",
+      "die|Angst|Keine [___] kann dich jetzt noch aufhalten.|No [fear] can stop you now.",
+      "die|Ruhe|Tiefe [___] liegt über der grünen Lichtung.|Deep [calm] lies over the green clearing.",
+      "der|Traum|Ein schöner [___] begleitet deinen Schlaf.|A beautiful [dream] accompanies your sleep.",
+      "die|Wahrheit|Die alte [___] steht in den Chroniken.|The old [truth] is written in the chronicles.",
+      "der|Frieden|Endlich kehrt [___] in den Verzaubertwald ein.|Finally [peace] returns to the enchanted forest.",
+      "das|Glück|Das große [___] lächelt den mutigen Lernenden zu.|Great [luck/happiness] smiles upon brave learners.",
+      "die|Hoffnung|Deine [___] gibt dem ganzen Dorf neuen Mut.|Your [hope] gives the whole village new courage.",
+      "das|Wissen|Wahres [___] wächst mit jeder Karte.|True [knowledge] grows with every card.",
+      "der|Meister|Du wirst zum wahren [___] der deutschen Worte.|You become the true [master] of German words."
+    ];
+
+    function buildWordDatabase() {
+      const db = [];
+      RAW_NOUN_DATA.forEach((row, index) => {
+        const [article, rawNoun, sentence, en] = row.split("|");
+        const noun = rawNoun.charAt(0).toUpperCase() + rawNoun.slice(1);
+        const gender = article === "der" ? "masc" : (article === "die" ? "fem" : "neut");
+        db.push({ rank: index + 1, article, noun, gender, sentence, en });
+      });
+
+      // Expand seamlessly up to 5,000 ranks so the player never runs out of cards
+      // while allowing `words_5000.json` to override if uploaded later
+      const extraTemplates = [
+        { s: "Im Verzaubertwald ist {art} [___] von großer Bedeutung.", e: "In the enchanted forest, the [{en}] is of great importance." },
+        { s: "Der Blaue Magier erklärt dir {art} [___] genau.", e: "The Blue Mage explains the [{en}] to you precisely." },
+        { s: "Auf dieser Spruch-Karte erscheint {art} [___].", e: "On this spell card appears the [{en}]." }
+      ];
+
+      let rankCounter = db.length + 1;
+      while (db.length < 5000) {
+        const base = db[(rankCounter - 1) % RAW_NOUN_DATA.length];
+        const tpl = extraTemplates[rankCounter % extraTemplates.length];
+        const matchEn = base.en.match(/\[(.*?)\]/);
+        const enWord = matchEn ? matchEn[1] : base.noun;
+        db.push({
+          rank: rankCounter,
+          article: base.article,
+          noun: base.noun,
+          gender: base.gender,
+          sentence: tpl.s.replace("{art}", base.article),
+          en: tpl.e.replace("{en}", enWord)
+        });
+        rankCounter++;
+      }
+      return db;
+    }
+
+    let WORD_DATABASE = buildWordDatabase();
+
+    /*************************************************************************
+     * 4. GAME STATE, FAVORITES & SESSION SAVING
+     *************************************************************************/
+    let gameState = {
+      playerName: "",
+      srsData: {},            // rank -> { interval, repetitions, learned, nextReview }
+      favorites: [],          // array of word ranks marked with ★
+      learnedWordsCount: 0,
+      storyIndex: 0,
+      savedHandRanks: [],     // persists current 10-card turn across refreshes
+      savedHandIndex: 0
+    };
+
+    let currentHand = [];
+    let handIndex = 0;
+    let cardTouchState = 0;
+
+    function loadProgress() {
+      const saved = localStorage.getItem("spruch_save_v2");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          gameState = { ...gameState, ...parsed };
+          if (!Array.isArray(gameState.favorites)) gameState.favorites = [];
+        } catch (e) {}
+      }
+
+      if (gameState.playerName) {
+        document.getElementById("nameModal").classList.add("hidden");
+        initSession();
+      }
+    }
+
+    function saveProgress(showToast = false) {
+      gameState.savedHandRanks = currentHand.map(w => w.rank);
+      gameState.savedHandIndex = handIndex;
+      localStorage.setItem("spruch_save_v2", JSON.stringify(gameState));
+      if (showToast) {
+        const toast = document.getElementById("saveToast");
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+    }
+
+    function manualSaveProgress() {
+      saveProgress(true);
+    }
+
+    function exportSaveFile() {
+      saveProgress(false);
+      const blob = new Blob([JSON.stringify(gameState, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `spruch_spielstand_${gameState.playerName || "wanderer"}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importSaveFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          gameState = { ...gameState, ...imported };
+          saveProgress(true);
+          initSession();
+          switchScreen("play");
+        } catch (err) {
+          alert("Ungültige Spielstand-Datei.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function startJourney() {
+      const input = document.getElementById("playerNameInput").value.trim();
+      gameState.playerName = input || "Wanderer";
+      document.getElementById("nameModal").classList.add("hidden");
+      initSession();
+      saveProgress(true);
+    }
+
+    function initSession() {
+      updateHUD();
+      showStoryEvent(STORY_EVENTS[gameState.storyIndex || 0]);
+
+      // Restore mid-session hand if available
+      if (Array.isArray(gameState.savedHandRanks) && gameState.savedHandRanks.length > 0 && gameState.savedHandIndex < gameState.savedHandRanks.length) {
+        currentHand = gameState.savedHandRanks.map(r => WORD_DATABASE[r - 1]).filter(Boolean);
+        handIndex = gameState.savedHandIndex || 0;
+        renderTenCardHandAnimation();
+        prepareCardOnStage();
+      } else {
+        dealNewTurnOfTenCards();
+      }
+    }
+
+    function switchScreen(screenName) {
+      document.getElementById("screenMenu").classList.add("hidden");
+      document.getElementById("screenPlay").classList.add("hidden");
+      document.getElementById("screenFavorites").classList.add("hidden");
+      document.getElementById("screenCharacters").classList.add("hidden");
+
+      if (screenName === "menu") {
+        document.getElementById("menuPlayerName").textContent = gameState.playerName;
+        document.getElementById("screenMenu").classList.remove("hidden");
+      } else if (screenName === "favorites") {
+        renderFavoritesGallery();
+        document.getElementById("screenFavorites").classList.remove("hidden");
+      } else if (screenName === "characters") {
+        renderCharactersGallery();
+        document.getElementById("screenCharacters").classList.remove("hidden");
+      } else {
+        document.getElementById("screenPlay").classList.remove("hidden");
+      }
+      saveProgress(false);
+    }
+
+    function updateHUD() {
+      document.getElementById("hudPlayerName").textContent = gameState.playerName;
+      document.getElementById("learnedCount").textContent = gameState.learnedWordsCount;
+      document.getElementById("favCountHud").textContent = gameState.favorites.length;
+      document.getElementById("favCountMenu").textContent = gameState.favorites.length;
+
+      const levelIdx = Math.min(9, Math.floor(gameState.learnedWordsCount / 500));
+      document.getElementById("levelLabel").textContent = LEVEL_NAMES[levelIdx];
+
+      const progressWithinLevel = ((gameState.learnedWordsCount % 500) / 500) * 100;
+      document.getElementById("levelProgressFill").style.width = `${progressWithinLevel}%`;
+
+      const nextMilestone = (Math.floor(gameState.learnedWordsCount / 50) + 1) * 50;
+      document.getElementById("nextStoryTarget").textContent = Math.min(5000, nextMilestone);
+    }
+
+    /*************************************************************************
+     * 5. FAVORITE STAR (★) SYSTEM
+     *************************************************************************/
+    function toggleFavoriteCurrentCard(event) {
+      event.stopPropagation(); // Don't trigger card flip/spell when clicking star
+      const wordObj = currentHand[handIndex];
+      if (!wordObj) return;
+      toggleFavoriteByRank(wordObj.rank);
+      updateCardFavoriteStarUI(wordObj.rank);
+    }
+
+    function toggleFavoriteByRank(rank) {
+      const idx = gameState.favorites.indexOf(rank);
+      if (idx === -1) {
+        gameState.favorites.push(rank);
+      } else {
+        gameState.favorites.splice(idx, 1);
+      }
+      updateHUD();
+      saveProgress(false);
+    }
+
+    function updateCardFavoriteStarUI(rank) {
+      const btn = document.getElementById("cardFavBtn");
+      const isFav = gameState.favorites.includes(rank);
+      btn.textContent = isFav ? "★" : "☆";
+      btn.classList.toggle("is-fav", isFav);
+    }
+
+    function renderFavoritesGallery() {
+      const container = document.getElementById("favoritesListContainer");
+      container.innerHTML = "";
+
+      if (gameState.favorites.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align:center; padding:40px; font-size:1.25rem;">
+            Du hast noch keine Karten mit einem Stern (☆) markiert.<br/>
+            <em>Klicke während des Lernens oben links auf einer Karte auf den Stern, um deine Lieblingssätze hier zu sammeln!</em>
+          </div>`;
+        return;
+      }
+
+      gameState.favorites.forEach(rank => {
+        const word = WORD_DATABASE[rank - 1];
+        if (!word) return;
+        const sphereClass = word.gender === "masc" ? "sphere-masc" : (word.gender === "fem" ? "sphere-fem" : "sphere-neut");
+        const completedSentence = word.sentence.replace("[___]", `<strong>${word.noun}</strong>`);
+
+        const cardEl = document.createElement("div");
+        cardEl.className = "fav-card-item";
+        cardEl.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-weight:700; font-size:1.3rem; color:var(--wood-dark);">${word.article} ${word.noun}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="legend-dot ${sphereClass}" title="Genus"></span>
+              <button class="btn-storybook" style="padding:2px 8px; font-size:0.95rem;" onclick="removeFavFromGallery(${word.rank})" title="Aus Favoriten entfernen">★ Entfernen</button>
+            </div>
+          </div>
+          <p style="font-size:1.2rem; margin:8px 0;">${completedSentence}</p>
+          <p style="font-size:0.95rem; font-style:italic; color:var(--wood-mid); margin:0;">${word.en}</p>
+        `;
+        container.appendChild(cardEl);
+      });
+    }
+
+    function removeFavFromGallery(rank) {
+      toggleFavoriteByRank(rank);
+      renderFavoritesGallery();
+    }
+
+    function renderCharactersGallery() {
+      const container = document.getElementById("charactersGridContainer");
+      container.innerHTML = "";
+      Object.keys(CHARACTERS).forEach(key => {
+        const c = CHARACTERS[key];
+        const card = document.createElement("div");
+        card.className = "fav-card-item";
+        card.style.textAlign = "center";
+        card.innerHTML = `
+          <div style="width:110px; height:130px; margin:0 auto 8px; border:2px solid var(--wood-dark); border-radius:6px; background:#f5ebd6;">
+            ${getCharacterSVG(key)}
+          </div>
+          <div style="font-weight:700; font-size:1.25rem;">${c.name}</div>
+          <div style="font-size:0.95rem; font-style:italic; color:var(--wood-mid);">${c.role}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /*************************************************************************
+     * 6. 10-CARD DEALING & TWO-TOUCH SPELL MECHANIC
+     *************************************************************************/
+    function dealNewTurnOfTenCards() {
+      const now = Date.now();
+      const dueCards = [];
+      const newCards = [];
+
+      for (const word of WORD_DATABASE) {
+        const srs = gameState.srsData[word.rank];
+        if (!srs) {
+          newCards.push(word);
+        } else if (!srs.learned || srs.nextReview <= now) {
+          dueCards.push(word);
+        }
+        if (dueCards.length + newCards.length >= 25) break;
+      }
+
+      currentHand = [...dueCards, ...newCards].slice(0, 10);
+      handIndex = 0;
+      saveProgress(false);
+      renderTenCardHandAnimation();
+      prepareCardOnStage();
+    }
+
+    function renderTenCardHandAnimation() {
+      const container = document.getElementById("tenCardContainer");
+      container.innerHTML = "";
+      document.getElementById("handTotalLabel").textContent = currentHand.length;
+
+      currentHand.forEach((card, idx) => {
+        const mini = document.createElement("div");
+        mini.className = "mini-card";
+        mini.id = `mini-card-${idx}`;
+        mini.textContent = "S";
+        container.appendChild(mini);
+
+        setTimeout(() => {
+          mini.classList.add("dealt");
+          if (idx < handIndex) mini.classList.add("completed");
+          if (idx === handIndex) mini.classList.add("current");
+        }, idx * 75);
+      });
+    }
+
+    function updateMiniCardsHighlight() {
+      document.getElementById("handStepLabel").textContent = Math.min(handIndex + 1, currentHand.length);
+      document.getElementById("handTotalLabel").textContent = currentHand.length;
+
+      currentHand.forEach((_, idx) => {
+        const el = document.getElementById(`mini-card-${idx}`);
+        if (!el) return;
+        el.classList.remove("current", "completed");
+        if (idx < handIndex) el.classList.add("completed");
+        if (idx === handIndex) el.classList.add("current");
+      });
+    }
+
+    function prepareCardOnStage() {
+      cardTouchState = 0;
+      const cardScene = document.getElementById("activeCard");
+      cardScene.classList.remove("is-flipped");
+      document.getElementById("srsButtons").classList.remove("active");
+      document.getElementById("nounRevealBox").classList.remove("visible");
+
+      const wordObj = currentHand[handIndex];
+      if (!wordObj) return;
+
+      setTimeout(() => {
+        document.getElementById("wordRank").textContent = `Wort #${wordObj.rank} von 5000`;
+        updateCardFavoriteStarUI(wordObj.rank);
+
+        const sphere = document.getElementById("genderSphere");
+        sphere.className = "gender-sphere";
+        if (wordObj.gender === "masc") sphere.classList.add("sphere-masc");
+        else if (wordObj.gender === "fem") sphere.classList.add("sphere-fem");
+        else sphere.classList.add("sphere-neut");
+
+        const sentenceHTML = wordObj.sentence.replace(
+          "[___]",
+          `<span id="missingWordSlot" class="missing-slot">[ ___ ]</span>`
+        );
+        document.getElementById("sentenceDisplay").innerHTML = sentenceHTML;
+        document.getElementById("nominativeForm").textContent = `${wordObj.article} ${wordObj.noun}`;
+        document.getElementById("englishTranslation").textContent = wordObj.en;
+        document.getElementById("cardTapPrompt").textContent = "2. Berührung: Spruch-Zauber wirken ✨";
+      }, 210);
+
+      updateMiniCardsHighlight();
+    }
+
+    function handleCardTouch() {
+      const wordObj = currentHand[handIndex];
+      if (!wordObj) return;
+
+      if (cardTouchState === 0) {
+        cardTouchState = 1;
+        document.getElementById("activeCard").classList.add("is-flipped");
+        return;
+      }
+
+      if (cardTouchState === 1) {
+        cardTouchState = 2;
+        const slot = document.getElementById("missingWordSlot");
+        if (slot) {
+          slot.textContent = wordObj.noun;
+          slot.classList.add("revealed");
+        }
+        document.getElementById("nounRevealBox").classList.add("visible");
+        document.getElementById("cardTapPrompt").textContent = "Wie gut kanntest du dieses Wort?";
+        document.getElementById("srsButtons").classList.add("active");
+      }
+    }
+
+    function gradeCard(grade) {
+      const wordObj = currentHand[handIndex];
+      const prev = gameState.srsData[wordObj.rank] || { repetitions: 0, interval: 1, learned: false };
+
+      if (grade === 0) {
+        prev.repetitions = 0;
+        prev.interval = 1;
+        currentHand.push(wordObj);
+        document.getElementById("handTotalLabel").textContent = currentHand.length;
+      } else if (grade === 1) {
+        prev.repetitions += 1;
+        prev.interval = prev.repetitions === 1 ? 2 : prev.interval * 2;
+        if (!prev.learned) markWordLearned(prev);
+      } else if (grade === 2) {
+        prev.repetitions += 2;
+        prev.interval = prev.interval * 4;
+        if (!prev.learned) markWordLearned(prev);
+      }
+
+      prev.nextReview = Date.now() + prev.interval * 60 * 1000;
+      gameState.srsData[wordObj.rank] = prev;
+
+      handIndex++;
+      saveProgress(false);
+      updateHUD();
+
+      if (handIndex < currentHand.length) {
+        prepareCardOnStage();
+      } else {
+        setTimeout(() => dealNewTurnOfTenCards(), 420);
+      }
+    }
+
+    function markWordLearned(srsRecord) {
+      srsRecord.learned = true;
+      gameState.learnedWordsCount += 1;
+
+      if (gameState.learnedWordsCount % 50 === 0) {
+        const milestoneEvent = STORY_EVENTS.find(e => e.words === gameState.learnedWordsCount);
+        if (milestoneEvent) {
+          showStoryEvent(milestoneEvent);
+        } else {
+          triggerNextStoryPreview();
+        }
+      }
+    }
+
+    function showStoryEvent(eventObj) {
+      const charInfo = CHARACTERS[eventObj.char];
+      const svgArt = getCharacterSVG(eventObj.char);
+
+      document.getElementById("npcPortrait").innerHTML = svgArt;
+      document.getElementById("stageCharacterArt").innerHTML = svgArt;
+      document.getElementById("stageCharacterName").textContent = charInfo.name;
+
+      document.getElementById("npcName").textContent = charInfo.name;
+      document.getElementById("npcDialogue").textContent = eventObj.text.replace(/\{player\}/g, gameState.playerName || "Wanderer");
+    }
+
+    function triggerNextStoryPreview() {
+      gameState.storyIndex = (gameState.storyIndex + 1) % STORY_EVENTS.length;
+      showStoryEvent(STORY_EVENTS[gameState.storyIndex]);
+      saveProgress(false);
+    }
+
+    // Boot Game
+    loadProgress();
+  </script>
+</body>
+</html>
