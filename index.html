@@ -9,18 +9,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
   <style>
     :root {
-      --parchment-light: #f7f1e1;
-      --parchment-mid: #ebd9b4;
-      --parchment-dark: #d2ba89;
-      --wood-dark: #2c1e16;
-      --wood-mid: #4a3325;
-      --forest-deep: #1b2e25;
-      --forest-moss: #3b5a45;
-      --ink: #231912;
+      --parchment-light: #f6efe0;
+      --parchment-mid: #e8d7b4;
+      --parchment-dark: #cfb584;
+      --wood-dark: #23170f;
+      --wood-mid: #473021;
+      --forest-bg: #0f1d17;
+      --forest-canopy: #1b3328;
+      --forest-moss: #3b5e46;
+      --ink: #221710;
       --orb-masc: #2980b9;   /* Blue: Masculine (der) */
       --orb-fem: #d85c8a;    /* Pink: Feminine (die) */
       --orb-neut: #2ecc71;   /* Green: Neuter (das) */
-      --spell-gold: #f3c65f;
+      --spell-gold: #f4c553;
     }
 
     * {
@@ -31,10 +32,7 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: var(--forest-deep);
-      background-image: 
-        radial-gradient(circle at 50% 35%, rgba(59, 90, 69, 0.45) 0%, rgba(20, 35, 28, 0.95) 80%),
-        repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 8px);
+      background-color: var(--forest-bg);
       color: var(--ink);
       font-family: 'Cormorant Garamond', Georgia, serif;
       min-height: 100vh;
@@ -42,71 +40,130 @@
       flex-direction: column;
       align-items: center;
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* Storybook Page Container */
-    .storybook-frame {
+    /* ENCHANTED FOREST ILLUSTRATED BACKGROUND */
+    .forest-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 40%, #264637 0%, #14271e 55%, #09130e 100%);
+    }
+
+    .forest-svg {
       width: 100%;
-      max-width: 1120px;
-      min-height: 94vh;
-      margin: 2vh auto;
-      background: radial-gradient(circle at center, var(--parchment-light) 0%, var(--parchment-mid) 75%, var(--parchment-dark) 100%);
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .firefly {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffe999;
+      box-shadow: 0 0 12px 4px rgba(244, 197, 83, 0.75);
+      animation: floatFirefly 8s infinite ease-in-out alternate;
+      opacity: 0.7;
+    }
+
+    @keyframes floatFirefly {
+      0%   { transform: translateY(0px) translateX(0px) scale(0.8); opacity: 0.3; }
+      50%  { transform: translateY(-35px) translateX(20px) scale(1.2); opacity: 0.9; }
+      100% { transform: translateY(-10px) translateX(-25px) scale(0.9); opacity: 0.4; }
+    }
+
+    /* STORYBOOK MAIN FRAME */
+    .storybook-frame {
+      width: 96%;
+      max-width: 1140px;
+      min-height: 92vh;
+      margin: 2.5vh auto;
+      background: radial-gradient(circle at center, var(--parchment-light) 0%, var(--parchment-mid) 78%, var(--parchment-dark) 100%);
       border: 8px solid var(--wood-dark);
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 
-        0 20px 50px rgba(0, 0, 0, 0.75),
-        inset 0 0 60px rgba(74, 51, 37, 0.35);
+        0 25px 60px rgba(0, 0, 0, 0.85),
+        0 0 0 3px #5c402c,
+        inset 0 0 70px rgba(60, 40, 25, 0.4);
       position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 20px 28px;
+      padding: 18px 26px;
     }
 
-    /* Top HUD */
+    /* Corner Botanical Ivy Ornaments */
+    .corner-vine {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      pointer-events: none;
+      opacity: 0.75;
+    }
+    .vine-tl { top: 8px; left: 8px; }
+    .vine-tr { top: 8px; right: 8px; transform: scaleX(-1); }
+    .vine-bl { bottom: 8px; left: 8px; transform: scaleY(-1); }
+    .vine-br { bottom: 8px; right: 8px; transform: scale(-1, -1); }
+
+    /* TOP NAVIGATION & HUD */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid rgba(74, 51, 37, 0.3);
+      border-bottom: 2px solid rgba(71, 48, 33, 0.35);
       padding-bottom: 12px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .hud-banner {
-      background: var(--parchment-mid);
+      background: rgba(232, 215, 180, 0.9);
       border: 2px solid var(--wood-mid);
-      padding: 8px 16px;
-      border-radius: 4px;
-      box-shadow: 2px 3px 0 rgba(44, 30, 22, 0.25);
-      font-size: 1.1rem;
+      padding: 6px 14px;
+      border-radius: 6px;
+      box-shadow: 2px 3px 0 rgba(35, 23, 15, 0.25);
+      font-size: 1.05rem;
       font-weight: 700;
     }
 
     .game-title {
       font-family: 'IM Fell English', serif;
-      font-size: 2.8rem;
+      font-size: 2.6rem;
       margin: 0;
       color: var(--wood-dark);
       letter-spacing: 1px;
-      text-shadow: 1px 2px 0 rgba(255, 255, 255, 0.6);
+      text-shadow: 1px 2px 0 rgba(255, 255, 255, 0.65);
+      cursor: pointer;
     }
 
     .game-title .illuminated-s {
       font-family: 'Cinzel Decorative', cursive;
-      font-size: 3.6rem;
+      font-size: 3.4rem;
       color: #6b2d1f;
       vertical-align: -4px;
     }
 
     .progress-bar-wrap {
-      width: 180px;
-      height: 10px;
+      width: 160px;
+      height: 9px;
       background: rgba(44, 30, 22, 0.2);
       border: 1px solid var(--wood-mid);
       border-radius: 5px;
-      margin-top: 5px;
+      margin-top: 4px;
       overflow: hidden;
     }
 
@@ -117,23 +174,144 @@
       transition: width 0.4s ease;
     }
 
-    /* Main Table Area */
+    /* BUTTONS */
+    .btn-storybook {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      border: 2px solid var(--wood-dark);
+      border-radius: 6px;
+      cursor: pointer;
+      background: var(--parchment-light);
+      color: var(--ink);
+      box-shadow: 2px 3px 0 var(--wood-dark);
+      transition: transform 0.12s, background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-storybook:hover {
+      background: #fffdf7;
+      transform: translateY(-2px);
+    }
+
+    .btn-storybook:active {
+      transform: translateY(1px);
+    }
+
+    /* TOAST NOTIFICATION FOR SAVING */
+    .save-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--forest-canopy);
+      color: var(--parchment-light);
+      border: 2px solid var(--spell-gold);
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-15px);
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .save-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* SCREENS (Menu, Play, Favorites, Characters) */
+    .screen-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 12px 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* MAIN MENU SCREEN */
+    .menu-container {
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+      background: rgba(255, 250, 238, 0.65);
+      border: 2px solid var(--wood-mid);
+      border-radius: 10px;
+      padding: 28px;
+      box-shadow: inset 0 0 30px rgba(71, 48, 33, 0.15);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+
+    .menu-btn-large {
+      padding: 16px;
+      font-size: 1.3rem;
+      justify-content: center;
+    }
+
+    /* PLAY TABLE LAYOUT */
     .play-table {
       display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 24px;
+      grid-template-columns: 220px 1fr 300px;
+      gap: 20px;
       align-items: center;
-      margin: 18px 0;
       flex: 1;
     }
 
-    @media (max-width: 850px) {
+    @media (max-width: 960px) {
       .play-table {
         grid-template-columns: 1fr;
       }
+      .forest-guardian-panel {
+        display: none;
+      }
     }
 
-    /* Active Card Stage */
+    /* LEFT PANEL: ILLUSTRATED CHARACTER IN THE FOREST */
+    .forest-guardian-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: rgba(59, 94, 70, 0.12);
+      border: 2px solid var(--wood-mid);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .guardian-illustration {
+      width: 170px;
+      height: 220px;
+      border: 2px solid var(--wood-dark);
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 35%, #f5ebd6 0%, #d5c095 100%);
+      box-shadow: inset 0 0 20px rgba(35, 23, 15, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    /* CENTER STAGE: POKEMON-STYLE SPELL CARD */
     .card-stage {
       display: flex;
       flex-direction: column;
@@ -144,8 +322,8 @@
     }
 
     .card-scene {
-      width: 290px;
-      height: 410px;
+      width: 300px;
+      height: 420px;
       perspective: 1200px;
       cursor: pointer;
       position: relative;
@@ -169,19 +347,18 @@
       height: 100%;
       backface-visibility: hidden;
       border-radius: 12px;
-      border: 3px solid var(--wood-dark);
-      background: radial-gradient(circle, #fbf6eb 0%, #e7d5b1 100%);
-      box-shadow: 0 12px 28px rgba(35, 25, 18, 0.35);
-      padding: 18px;
+      border: 3.5px solid var(--wood-dark);
+      background: radial-gradient(circle, #fbf6eb 0%, #e4cfa6 100%);
+      box-shadow: 0 14px 32px rgba(20, 14, 9, 0.45);
+      padding: 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
 
-    /* Botanical Vine Inner Border */
     .vine-border {
-      border: 1.5px solid var(--wood-mid);
-      border-radius: 6px;
+      border: 2px solid var(--wood-mid);
+      border-radius: 8px;
       width: 100%;
       height: 100%;
       position: relative;
@@ -189,32 +366,22 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: 22px 18px;
       text-align: center;
     }
 
-    .vine-border::before,
-    .vine-border::after {
-      content: "❧";
-      position: absolute;
-      font-size: 1.5rem;
-      color: var(--wood-mid);
-      line-height: 1;
-    }
-    .vine-border::before { top: 4px; left: 8px; }
-    .vine-border::after { bottom: 4px; right: 8px; transform: rotate(180deg); }
-
-    /* Card Back - Ornate Illuminated S */
+    /* Card Back - Ornate Medieval Illuminated S */
     .card-back .illuminated-crest {
       font-family: 'Cinzel Decorative', serif;
       font-size: 7.5rem;
       color: var(--wood-dark);
       text-shadow: 2px 2px 0 var(--parchment-dark);
       line-height: 1;
-      border: 2px double var(--wood-mid);
+      border: 3px double var(--wood-mid);
       padding: 18px 34px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.3);
+      box-shadow: inset 0 0 15px rgba(71, 48, 33, 0.25);
     }
 
     .card-back-hint {
@@ -224,12 +391,44 @@
       color: var(--wood-mid);
     }
 
-    /* Card Front */
     .card-front {
       transform: rotateY(180deg);
     }
 
-    /* Top-Right Gender Magic Sphere */
+    /* TOP-LEFT FAVORITE STAR BUTTON */
+    .favorite-star-btn {
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 3px solid var(--wood-dark);
+      background: var(--parchment-light);
+      color: #9e8a66;
+      font-size: 1.65rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+      transition: transform 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .favorite-star-btn:hover {
+      transform: scale(1.12);
+    }
+
+    .favorite-star-btn.is-fav {
+      background: #fff6d1;
+      color: #d49b17;
+      text-shadow: 0 0 10px rgba(244, 197, 83, 0.9);
+      border-color: #6b4c0b;
+    }
+
+    /* TOP-RIGHT GENDER MAGIC SPHERE */
     .gender-sphere {
       position: absolute;
       top: -12px;
@@ -238,9 +437,8 @@
       height: 48px;
       border-radius: 50%;
       border: 3px solid var(--wood-dark);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset -4px -4px 8px rgba(0,0,0,0.4), inset 4px 4px 10px rgba(255,255,255,0.7);
-      z-index: 5;
-      transition: transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45), inset -4px -4px 8px rgba(0,0,0,0.4), inset 4px 4px 10px rgba(255,255,255,0.75);
+      z-index: 6;
     }
     .sphere-masc { background: radial-gradient(circle at 35% 35%, #7ec8ff, var(--orb-masc) 60%, #103c5c 100%); }
     .sphere-fem  { background: radial-gradient(circle at 35% 35%, #ff9ec4, var(--orb-fem) 60%, #6e183b 100%); }
@@ -248,18 +446,17 @@
 
     .word-rank-badge {
       position: absolute;
-      top: 10px;
-      left: 14px;
+      top: 8px;
       font-size: 0.9rem;
       color: var(--wood-mid);
       font-style: italic;
     }
 
     .sentence-de {
-      font-size: 1.65rem;
+      font-size: 1.55rem;
       line-height: 1.4;
       color: var(--ink);
-      margin: 16px 0 12px;
+      margin: 18px 0 10px;
     }
 
     .missing-slot {
@@ -267,20 +464,20 @@
       padding: 2px 10px;
       border-bottom: 2px dashed var(--wood-mid);
       font-weight: 700;
-      color: #4a3325;
+      color: #5a3921;
       transition: all 0.5s ease;
     }
 
     .missing-slot.revealed {
       border-bottom: 2px solid transparent;
       color: #134e32;
-      background: rgba(243, 198, 95, 0.35);
+      background: rgba(244, 197, 83, 0.4);
       border-radius: 4px;
       animation: spellFlash 0.8s ease-out;
     }
 
     @keyframes spellFlash {
-      0% { transform: scale(1.25); box-shadow: 0 0 25px var(--spell-gold); background: #fff8d6; }
+      0% { transform: scale(1.25); box-shadow: 0 0 30px var(--spell-gold); background: #fff9db; }
       100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
     }
 
@@ -288,12 +485,12 @@
       opacity: 0;
       transform: translateY(8px);
       transition: all 0.4s ease;
-      background: rgba(74, 51, 37, 0.08);
-      border-top: 1px solid rgba(74, 51, 37, 0.25);
-      border-bottom: 1px solid rgba(74, 51, 37, 0.25);
-      padding: 8px 14px;
+      background: rgba(71, 48, 33, 0.09);
+      border-top: 1px solid rgba(71, 48, 33, 0.25);
+      border-bottom: 1px solid rgba(71, 48, 33, 0.25);
+      padding: 8px 12px;
       width: 100%;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .noun-base-box.visible {
@@ -308,24 +505,24 @@
     }
 
     .sentence-en {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-style: italic;
       color: var(--wood-mid);
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .tap-instruction {
       font-size: 0.95rem;
       color: var(--forest-moss);
       font-style: italic;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
-    /* SRS Evaluation Buttons */
+    /* SRS GRADING CONTROLS */
     .srs-controls {
-      margin-top: 18px;
+      margin-top: 14px;
       display: flex;
-      gap: 12px;
+      gap: 10px;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -336,61 +533,32 @@
       pointer-events: auto;
     }
 
-    .btn-storybook {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 9px 18px;
-      border: 2px solid var(--wood-dark);
-      border-radius: 5px;
-      cursor: pointer;
-      background: var(--parchment-light);
-      color: var(--ink);
-      box-shadow: 2px 3px 0 var(--wood-dark);
-      transition: transform 0.1s, background 0.2s;
-    }
-
-    .btn-storybook:hover {
-      background: #fff;
-      transform: translateY(-2px);
-    }
-
-    .btn-storybook:active {
-      transform: translateY(1px);
-    }
-
     .btn-again { border-color: #7a2828; color: #7a2828; }
-    .btn-good  { border-color: var(--forest-moss); color: var(--forest-deep); }
+    .btn-good  { border-color: var(--forest-moss); color: var(--forest-bg); }
     .btn-easy  { border-color: #1f507a; color: #1f507a; }
 
-    /* Right Side: Hand of 10 Cards + Legend */
+    /* RIGHT PANEL: 10-CARD HAND */
     .hand-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: rgba(74, 51, 37, 0.06);
-      border: 1.5px solid rgba(74, 51, 37, 0.25);
+      background: rgba(71, 48, 33, 0.07);
+      border: 1.5px solid rgba(71, 48, 33, 0.3);
       border-radius: 8px;
-      padding: 18px;
-    }
-
-    .hand-title {
-      font-weight: 700;
-      font-size: 1.25rem;
-      margin-bottom: 12px;
+      padding: 16px;
     }
 
     .ten-card-fan {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0 18px;
+      gap: 7px;
+      margin: 10px 0 14px;
     }
 
     .mini-card {
-      width: 46px;
-      height: 66px;
+      width: 44px;
+      height: 62px;
       border: 2px solid var(--wood-dark);
       border-radius: 5px;
       background: var(--parchment-mid);
@@ -399,12 +567,12 @@
       justify-content: center;
       font-family: 'Cinzel Decorative', serif;
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--wood-dark);
       box-shadow: 1px 2px 4px rgba(0,0,0,0.25);
       transition: all 0.35s ease;
       opacity: 0;
-      transform: translateY(-25px) scale(0.8);
+      transform: translateY(-20px) scale(0.8);
     }
 
     .mini-card.dealt {
@@ -415,7 +583,7 @@
     .mini-card.current {
       border-color: #b5852b;
       box-shadow: 0 0 12px var(--spell-gold);
-      transform: translateY(-6px) scale(1.08);
+      transform: translateY(-5px) scale(1.08);
       background: var(--parchment-light);
     }
 
@@ -428,12 +596,12 @@
 
     .orb-legend {
       width: 100%;
-      border-top: 1px solid rgba(74, 51, 37, 0.2);
-      padding-top: 12px;
-      font-size: 0.98rem;
+      border-top: 1px solid rgba(71, 48, 33, 0.2);
+      padding-top: 10px;
+      font-size: 0.95rem;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .legend-row {
@@ -443,28 +611,46 @@
     }
 
     .legend-dot {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       border-radius: 50%;
       border: 1.5px solid var(--wood-dark);
     }
 
-    /* Bottom Storybook Scroll Dialogue */
+    /* FAVORITES GALLERY SCREEN */
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      max-height: 62vh;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .fav-card-item {
+      background: radial-gradient(circle, #fbf6eb 0%, #e6d3ad 100%);
+      border: 2px solid var(--wood-dark);
+      border-radius: 8px;
+      padding: 14px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
+
+    /* BOTTOM DIALOGUE SCROLL */
     .dialogue-scroll {
-      background: linear-gradient(180deg, #f3e6c8 0%, #e5d1a7 100%);
+      background: linear-gradient(180deg, #f3e6c8 0%, #e2cca0 100%);
       border: 3px solid var(--wood-dark);
       border-radius: 8px;
-      padding: 14px 20px;
+      padding: 12px 18px;
       display: flex;
       align-items: center;
-      gap: 18px;
-      box-shadow: inset 0 0 18px rgba(74, 51, 37, 0.2), 0 6px 14px rgba(0,0,0,0.2);
-      position: relative;
+      gap: 16px;
+      box-shadow: inset 0 0 18px rgba(71, 48, 33, 0.2), 0 6px 14px rgba(0,0,0,0.25);
     }
 
     .npc-portrait {
-      width: 78px;
-      height: 78px;
+      width: 76px;
+      height: 76px;
       border-radius: 6px;
       border: 2px solid var(--wood-dark);
       background: var(--parchment-light);
@@ -475,28 +661,24 @@
       overflow: hidden;
     }
 
-    .dialogue-content {
-      flex: 1;
-    }
-
     .npc-name {
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: #5a271b;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .dialogue-text {
-      font-size: 1.15rem;
-      line-height: 1.4;
+      font-size: 1.1rem;
+      line-height: 1.35;
       margin: 0;
     }
 
-    /* Name Input & Story Cutscene Modal */
+    /* MODAL FOR PLAYER NAME */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 24, 19, 0.85);
+      background: rgba(10, 19, 14, 0.88);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -505,14 +687,14 @@
     }
 
     .modal-card {
-      max-width: 580px;
+      max-width: 560px;
       width: 100%;
       background: var(--parchment-light);
       border: 5px solid var(--wood-dark);
       border-radius: 10px;
-      padding: 32px;
+      padding: 30px;
       text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.85);
     }
 
     .name-input {
@@ -523,126 +705,241 @@
       border: 2px solid var(--wood-mid);
       background: #fffdf7;
       border-radius: 4px;
-      margin: 18px 0;
+      margin: 16px 0;
       text-align: center;
-    }
-
-    .hidden {
-      display: none !important;
     }
   </style>
 </head>
 <body>
 
-  <!-- Name Prompt Modal (Player is never shown, referred to by name) -->
+  <!-- ENCHANTED FOREST (VERZAUBERTWALD) ILLUSTRATED SVG BACKDROP -->
+  <div class="forest-backdrop">
+    <svg class="forest-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- Distant misty pines -->
+      <path d="M0,900 L0,450 L60,320 L110,450 L180,290 L240,460 L310,340 L380,480 L1440,480 L1440,900 Z" fill="#13261d" opacity="0.7"/>
+      <!-- Gnarled Left Ancient Oak Tree -->
+      <path d="M-20,900 L140,900 C110,720 95,550 130,380 C160,260 260,140 390,80 L350,40 C220,100 120,200 70,310 C40,180 120,80 210,10 L130,0 C40,90 -10,220 -20,900 Z" fill="#1d140e" stroke="#3a281c" stroke-width="3"/>
+      <!-- Gnarled Right Ancient Oak Tree -->
+      <path d="M1460,900 L1300,900 C1330,720 1345,550 1310,380 C1280,260 1180,140 1050,80 L1090,40 C1220,100 1320,200 1370,310 C1400,180 1320,80 1230,10 L1310,0 C1400,90 1450,220 1460,900 Z" fill="#1d140e" stroke="#3a281c" stroke-width="3"/>
+      <!-- Hanging Forest Moss & Canopy Leaves -->
+      <circle cx="120" cy="110" r="140" fill="#1e382b" opacity="0.85"/>
+      <circle cx="280" cy="60" r="110" fill="#274736" opacity="0.75"/>
+      <circle cx="1320" cy="110" r="140" fill="#1e382b" opacity="0.85"/>
+      <circle cx="1160" cy="60" r="110" fill="#274736" opacity="0.75"/>
+    </svg>
+    <div class="firefly" style="top: 22%; left: 8%; animation-delay: 0s;"></div>
+    <div class="firefly" style="top: 68%; left: 5%; animation-delay: 2s;"></div>
+    <div class="firefly" style="top: 30%; right: 7%; animation-delay: 1.2s;"></div>
+    <div class="firefly" style="top: 75%; right: 6%; animation-delay: 3.5s;"></div>
+  </div>
+
+  <!-- SAVE NOTIFICATION TOAST -->
+  <div id="saveToast" class="save-toast">✓ Fortschritt im Verzaubertwald gespeichert!</div>
+
+  <!-- NAME INPUT MODAL -->
   <div id="nameModal" class="modal-overlay">
     <div class="modal-card">
       <h2 style="font-family:'IM Fell English',serif; font-size:2.2rem; margin-top:0;">Willkommen im Verzaubertwald</h2>
       <p style="font-size:1.2rem; line-height:1.5;">
-        Du bist als Fremder in diesen alten Wald gereist, um die Geheimnisse der deutschen Sprache durch Immersion zu erlernen. Doch ein Schwarzbart-Magier hat die Worte gestohlen, um sie allein den Magiern vorzubehalten.
+        Du bist als Fremder in diesen alten Wald gereist, um die Geheimnisse der deutschen Sprache durch Immersion zu erlernen. Doch der Schwarzbart-Magier hat die Worte gestohlen, um sie allein den Magiern vorzubehalten.
       </p>
       <p style="font-size:1.15rem; font-style:italic;">Wie lautet dein Name, Reisender?</p>
       <input type="text" id="playerNameInput" class="name-input" placeholder="Dein Name..." maxlength="24" />
       <br />
-      <button class="btn-storybook" onclick="startJourney()">Den Wald betreten</button>
+      <button class="btn-storybook" onclick="startJourney()">Den Verzaubertwald betreten</button>
     </div>
   </div>
 
-  <!-- Main Storybook Interface -->
+  <!-- MAIN STORYBOOK PARCHMENT -->
   <div class="storybook-frame">
+    <!-- Hand-drawn Inked Ivy Corners -->
+    <svg class="corner-vine vine-tl" viewBox="0 0 100 100"><path d="M5,95 Q5,5 95,5 M20,70 Q25,25 70,20 M15,45 C30,45 45,30 45,15" fill="none" stroke="#3b5e46" stroke-width="3"/><circle cx="45" cy="15" r="5" fill="#3b5e46"/><circle cx="15" cy="45" r="5" fill="#3b5e46"/></svg>
+    <svg class="corner-vine vine-tr" viewBox="0 0 100 100"><path d="M5,95 Q5,5 95,5 M20,70 Q25,25 70,20 M15,45 C30,45 45,30 45,15" fill="none" stroke="#3b5e46" stroke-width="3"/><circle cx="45" cy="15" r="5" fill="#3b5e46"/><circle cx="15" cy="45" r="5" fill="#3b5e46"/></svg>
+    <svg class="corner-vine vine-bl" viewBox="0 0 100 100"><path d="M5,95 Q5,5 95,5 M20,70 Q25,25 70,20 M15,45 C30,45 45,30 45,15" fill="none" stroke="#3b5e46" stroke-width="3"/><circle cx="45" cy="15" r="5" fill="#3b5e46"/><circle cx="15" cy="45" r="5" fill="#3b5e46"/></svg>
+    <svg class="corner-vine vine-br" viewBox="0 0 100 100"><path d="M5,95 Q5,5 95,5 M20,70 Q25,25 70,20 M15,45 C30,45 45,30 45,15" fill="none" stroke="#3b5e46" stroke-width="3"/><circle cx="45" cy="15" r="5" fill="#3b5e46"/><circle cx="15" cy="45" r="5" fill="#3b5e46"/></svg>
+
+    <!-- HEADER HUD -->
     <header>
-      <div class="hud-banner">
-        <div id="levelLabel">Stufe 1: Waldfremder</div>
-        <div style="font-size:0.9rem; font-weight:400;">
-          Reisender: <strong id="hudPlayerName">...</strong>
-        </div>
-        <div class="progress-bar-wrap" title="Fortschritt bis zur nächsten Stufe (alle 500 Wörter)">
-          <div id="levelProgressFill" class="progress-bar-fill"></div>
+      <div class="hud-group">
+        <button class="btn-storybook" onclick="switchScreen('menu')">☰ Hauptmenü</button>
+        <button class="btn-storybook" onclick="switchScreen('favorites')">★ Favoriten (<span id="favCountHud">0</span>)</button>
+        <div class="hud-banner">
+          <div id="levelLabel">Stufe 1: Waldfremder</div>
+          <div class="progress-bar-wrap" title="Fortschritt bis zur nächsten Stufe (alle 500 Wörter)">
+            <div id="levelProgressFill" class="progress-bar-fill"></div>
+          </div>
         </div>
       </div>
 
-      <h1 class="game-title"><span class="illuminated-s">S</span>pruch</h1>
+      <h1 class="game-title" onclick="switchScreen('play')" title="Zurück zum Spiel"><span class="illuminated-s">S</span>pruch</h1>
 
-      <div class="hud-banner" style="text-align:right;">
-        <div>Gelernte Wörter: <span id="learnedCount">0</span> / 5000</div>
-        <div style="font-size:0.9rem; font-weight:400; color:var(--forest-moss);">
-          Nächste Begegnung bei: <span id="nextStoryTarget">50</span> Wörtern
+      <div class="hud-group">
+        <div class="hud-banner" style="text-align:right;">
+          <div>Gelernt: <span id="learnedCount">0</span> / 5000</div>
+          <div style="font-size:0.88rem; font-weight:400; color:var(--forest-moss);">
+            Reisender: <strong id="hudPlayerName">...</strong>
+          </div>
         </div>
+        <button class="btn-storybook" onclick="manualSaveProgress()" title="Sitzung jetzt speichern">💾 Speichern</button>
       </div>
     </header>
 
-    <!-- Center Card Table -->
-    <div class="play-table">
-      <div class="card-stage">
-        <div id="activeCard" class="card-scene" onclick="handleCardTouch()">
-          <div class="card-inner">
-            <!-- BACK OF CARD (Ornamental S) -->
-            <div class="card-face card-back">
-              <div class="vine-border">
-                <div class="illuminated-crest">S</div>
-                <div class="card-back-hint">Berühre die Karte, um sie aufzudecken</div>
-              </div>
-            </div>
+    <!-- ===================================================================
+         SCREEN 1: MAIN MENU (HAUPTMENÜ)
+         =================================================================== -->
+    <main id="screenMenu" class="screen-view hidden">
+      <div class="menu-container">
+        <h2 style="font-family:'IM Fell English',serif; font-size:2.3rem; margin:0 0 8px;">Die Chroniken des Verzaubertwalds</h2>
+        <p style="font-size:1.15rem; margin:0 0 16px;">
+          Willkommen zurück, <strong id="menuPlayerName">Wanderer</strong>. Deine aktuelle Runde und alle gelernten Wörter sind gespeichert.
+        </p>
 
-            <!-- FRONT OF CARD -->
-            <div class="card-face card-front">
-              <div id="genderSphere" class="gender-sphere sphere-masc" title="Wortgeschlecht"></div>
-              <div class="vine-border">
-                <span id="wordRank" class="word-rank-badge">#1</span>
-                <p id="sentenceDisplay" class="sentence-de"></p>
-                
-                <div id="nounRevealBox" class="noun-base-box">
-                  <div id="nominativeForm" class="noun-nominative"></div>
-                  <div id="englishTranslation" class="sentence-en"></div>
-                </div>
-
-                <div id="cardTapPrompt" class="tap-instruction">
-                  Berühre die Karte erneut für den Spruch-Zauber ✨
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="menu-grid">
+          <button class="btn-storybook menu-btn-large" onclick="switchScreen('play')">
+            🃏 Weiterlernen (Aktuelle Runde)
+          </button>
+          <button class="btn-storybook menu-btn-large" onclick="switchScreen('favorites')">
+            ★ Favoriten-Karten (<span id="favCountMenu">0</span>)
+          </button>
+          <button class="btn-storybook menu-btn-large" onclick="switchScreen('characters')">
+            🌲 Die 11 Wald-Charaktere
+          </button>
+          <button class="btn-storybook menu-btn-large" onclick="manualSaveProgress()">
+            💾 Fortschritt jetzt sichern
+          </button>
         </div>
 
-        <!-- Spaced Repetition Grading Buttons (Appear after 2nd touch) -->
-        <div id="srsButtons" class="srs-controls">
-          <button class="btn-storybook btn-again" onclick="gradeCard(0)">Noch mal (Schwer)</button>
-          <button class="btn-storybook btn-good" onclick="gradeCard(1)">Gut (Merken)</button>
-          <button class="btn-storybook btn-easy" onclick="gradeCard(2)">Gemeistert (Gelernt)</button>
+        <hr style="border:0; border-top:1px solid rgba(71,48,33,0.3); margin:22px 0;" />
+
+        <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+          <button class="btn-storybook" onclick="exportSaveFile()">⬇ Spielstand als Datei herunterladen</button>
+          <label class="btn-storybook" style="cursor:pointer;">
+            ⬆ Spielstand-Datei laden
+            <input type="file" accept=".json" style="display:none;" onchange="importSaveFile(event)" />
+          </label>
         </div>
       </div>
+    </main>
 
-      <!-- Right Column: 10-Card Turn Hand & Gender Sphere Legend -->
-      <aside class="hand-panel">
-        <div class="hand-title">Aktuelle Runde (10 Karten)</div>
-        <div id="tenCardContainer" class="ten-card-fan"></div>
-
-        <button class="btn-storybook" style="width:100%; margin-bottom:14px; font-size:0.95rem;" onclick="triggerNextStoryPreview()">
-          Nächsten Story-Dialog testen (Alle 50 Wörter)
-        </button>
-
-        <div class="orb-legend">
-          <strong>Magische Sphären (Genus):</strong>
-          <div class="legend-row">
-            <span class="legend-dot sphere-masc"></span>
-            <span><strong>Blau:</strong> Maskulinum (der)</span>
+    <!-- ===================================================================
+         SCREEN 2: ACTIVE GAMEPLAY (PLAY TABLE)
+         =================================================================== -->
+    <main id="screenPlay" class="screen-view">
+      <div class="play-table">
+        <!-- Left Column: Hand-Drawn Forest Character Companion -->
+        <aside class="forest-guardian-panel">
+          <div style="font-weight:700; font-size:1.05rem; margin-bottom:6px; color:var(--forest-moss);">Begleiter im Wald</div>
+          <div id="stageCharacterArt" class="guardian-illustration"></div>
+          <div id="stageCharacterName" style="font-weight:700; font-size:1.15rem;">Blauer Magier</div>
+          <div style="font-size:0.9rem; font-style:italic; color:var(--wood-mid); margin-top:4px;">
+            Nächster Dialog bei <span id="nextStoryTarget">50</span> Wörtern
           </div>
-          <div class="legend-row">
-            <span class="legend-dot sphere-fem"></span>
-            <span><strong>Rosa:</strong> Femininum (die)</span>
+        </aside>
+
+        <!-- Center Column: Active Card -->
+        <div class="card-stage">
+          <div id="activeCard" class="card-scene" onclick="handleCardTouch()">
+            <div class="card-inner">
+              <!-- CARD BACK (Medieval Illuminated S) -->
+              <div class="card-face card-back">
+                <div class="vine-border">
+                  <div class="illuminated-crest">S</div>
+                  <div class="card-back-hint">1. Berührung: Karte umdrehen</div>
+                </div>
+              </div>
+
+              <!-- CARD FRONT -->
+              <div class="card-face card-front">
+                <!-- TOP-LEFT FAVORITE STAR BUTTON -->
+                <button id="cardFavBtn" class="favorite-star-btn" onclick="toggleFavoriteCurrentCard(event)" title="Als Favorit markieren">
+                  ☆
+                </button>
+
+                <!-- TOP-RIGHT GENDER MAGIC SPHERE -->
+                <div id="genderSphere" class="gender-sphere sphere-masc" title="Wortgeschlecht"></div>
+
+                <div class="vine-border">
+                  <span id="wordRank" class="word-rank-badge">Wort #1</span>
+                  <p id="sentenceDisplay" class="sentence-de"></p>
+                  
+                  <div id="nounRevealBox" class="noun-base-box">
+                    <div id="nominativeForm" class="noun-nominative"></div>
+                    <div id="englishTranslation" class="sentence-en"></div>
+                  </div>
+
+                  <div id="cardTapPrompt" class="tap-instruction">
+                    2. Berührung: Spruch-Zauber wirken ✨
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="legend-row">
-            <span class="legend-dot sphere-neut"></span>
-            <span><strong>Grün:</strong> Neutrum (das)</span>
+
+          <!-- Spaced Repetition Grading Buttons -->
+          <div id="srsButtons" class="srs-controls">
+            <button class="btn-storybook btn-again" onclick="gradeCard(0)">Noch mal</button>
+            <button class="btn-storybook btn-good" onclick="gradeCard(1)">Gut</button>
+            <button class="btn-storybook btn-easy" onclick="gradeCard(2)">Gemeistert</button>
           </div>
         </div>
-      </aside>
-    </div>
 
-    <!-- Bottom Character Dialogue Scroll -->
+        <!-- Right Column: 10-Card Hand & Gender Sphere Legend -->
+        <aside class="hand-panel">
+          <div style="font-weight:700; font-size:1.2rem;">Deine 10 Spruch-Karten</div>
+          <div style="font-size:0.9rem; color:var(--wood-mid); margin-bottom:4px;">
+            Karte <span id="handStepLabel">1</span> von <span id="handTotalLabel">10</span>
+          </div>
+          <div id="tenCardContainer" class="ten-card-fan"></div>
+
+          <button class="btn-storybook" style="width:100%; margin-bottom:12px; font-size:0.95rem; justify-content:center;" onclick="triggerNextStoryPreview()">
+            📜 Nächsten Wald-Dialog lesen
+          </button>
+
+          <div class="orb-legend">
+            <strong>Magische Sphären (Genus):</strong>
+            <div class="legend-row">
+              <span class="legend-dot sphere-masc"></span>
+              <span><strong>Blau:</strong> Maskulinum (der)</span>
+            </div>
+            <div class="legend-row">
+              <span class="legend-dot sphere-fem"></span>
+              <span><strong>Rosa:</strong> Femininum (die)</span>
+            </div>
+            <div class="legend-row">
+              <span class="legend-dot sphere-neut"></span>
+              <span><strong>Grün:</strong> Neutrum (das)</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- ===================================================================
+         SCREEN 3: FAVORITE CARDS GALLERY (★ FAVORITEN)
+         =================================================================== -->
+    <main id="screenFavorites" class="screen-view hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="font-family:'IM Fell English',serif; font-size:2rem; margin:0;">★ Deine Favoriten-Karten</h2>
+        <button class="btn-storybook" onclick="switchScreen('play')">← Zurück zum Spiel</button>
+      </div>
+      <div id="favoritesListContainer" class="favorites-grid"></div>
+    </main>
+
+    <!-- ===================================================================
+         SCREEN 4: THE 11 CHARACTERS OF VERZAUBERTWALD
+         =================================================================== -->
+    <main id="screenCharacters" class="screen-view hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 style="font-family:'IM Fell English',serif; font-size:2rem; margin:0;">Die 11 Charaktere des Verzaubertwalds</h2>
+        <button class="btn-storybook" onclick="switchScreen('play')">← Zurück zum Spiel</button>
+      </div>
+      <div id="charactersGridContainer" class="favorites-grid"></div>
+    </main>
+
+    <!-- BOTTOM STORYBOOK DIALOGUE SCROLL -->
     <section class="dialogue-scroll">
       <div id="npcPortrait" class="npc-portrait"></div>
-      <div class="dialogue-content">
+      <div style="flex:1;">
         <div id="npcName" class="npc-name">Blauer Magier</div>
         <p id="npcDialogue" class="dialogue-text"></p>
       </div>
@@ -651,389 +948,49 @@
 
   <script>
     /*************************************************************************
-     * 1. LEVEL NAMES (10 Levels — 1 every 500 words learned)
-     * Replace these strings with your custom level names anytime!
+     * 1. LEVEL NAMES (10 Levels — Every 500 Words)
      *************************************************************************/
     const LEVEL_NAMES = [
-      "Stufe 1: Waldfremder",           // 0 - 499 words
-      "Stufe 2: Silbensucher",          // 500 - 999 words
-      "Stufe 3:Spruchlehrling",         // 1000 - 1499 words
-      "Stufe 4: Wurzelleser",           // 1500 - 1999 words
-      "Stufe 5: Hüter der Nomen",       // 2000 - 2499 words
-      "Stufe 6: Nebelwanderer",         // 2500 - 2999 words
-      "Stufe 7: Freund der Wesen",      // 3000 - 3499 words
-      "Stufe 8: Meister der Sphären",   // 3500 - 3999 words
-      "Stufe 9: Bewahrer der Sprache",  // 4000 - 4499 words
-      "Stufe 10: Stimme des Verzaubertwalds" // 4500 - 5000 words
+      "Stufe 1: Waldfremder",
+      "Stufe 2: Silbensucher",
+      "Stufe 3: Spruchlehrling",
+      "Stufe 4: Wurzelleser",
+      "Stufe 5: Hüter der Nomen",
+      "Stufe 6: Nebelwanderer",
+      "Stufe 7: Freund der Wesen",
+      "Stufe 8: Meister der Sphären",
+      "Stufe 9: Bewahrer der Sprache",
+      "Stufe 10: Stimme des Verzaubertwalds"
     ];
 
     /*************************************************************************
-     * 2. THE 11 CHARACTERS & LORE MILESTONES (Every 50 Learned Words)
+     * 2. HAND-DRAWN INKED STORYBOOK SVG PORTRAITS FOR ALL 11 CHARACTERS
      *************************************************************************/
+    function getCharacterSVG(charKey) {
+      const svgs = {
+        blueMage: `<svg viewBox="0 0 120 140"><path d="M20,135 Q60,115 100,135 L90,65 Q60,50 30,65 Z" fill="#2d5a7b" stroke="#23170f" stroke-width="2.5"/><path d="M35,55 Q60,5 85,55 Z" fill="#224560" stroke="#23170f" stroke-width="2.5"/><circle cx="60" cy="58" r="16" fill="#edd5b3" stroke="#23170f" stroke-width="2"/><path d="M46,66 Q60,115 74,66 Z" fill="#f3efe6" stroke="#23170f" stroke-width="1.8"/><line x1="98" y1="20" x2="92" y2="135" stroke="#4a301d" stroke-width="4"/><circle cx="98" cy="18" r="6" fill="#5bc0ff" stroke="#23170f" stroke-width="1.5"/></svg>`,
+        greyTroll: `<svg viewBox="0 0 120 140"><path d="M15,135 Q60,105 105,135 L95,60 Q60,45 25,60 Z" fill="#6e7a72" stroke="#23170f" stroke-width="3"/><circle cx="60" cy="52" r="24" fill="#7d8a81" stroke="#23170f" stroke-width="2.5"/><path d="M25,48 L38,54 M95,48 L82,54" stroke="#23170f" stroke-width="3"/><path d="M45,66 L48,58 M75,66 L72,58" stroke="#f5f0e1" stroke-width="3"/><path d="M30,45 Q60,25 90,45" fill="#466942" opacity="0.7"/></svg>`,
+        warrior: `<svg viewBox="0 0 120 140"><path d="M22,135 L98,135 L88,65 L32,65 Z" fill="#5e4636" stroke="#23170f" stroke-width="2.5"/><path d="M25,70 Q60,52 95,70" fill="none" stroke="#8c7a6b" stroke-width="8"/><circle cx="60" cy="50" r="17" fill="#e5c7a3" stroke="#23170f" stroke-width="2"/><path d="M42,45 Q60,25 78,45 Z" fill="#7a8288" stroke="#23170f" stroke-width="2.5"/><circle cx="88" cy="95" r="20" fill="#7c5032" stroke="#23170f" stroke-width="3"/></svg>`,
+        couple: `<svg viewBox="0 0 120 140"><path d="M15,135 L55,135 L50,70 L20,70 Z" fill="#5b6e49" stroke="#23170f" stroke-width="2"/><circle cx="35" cy="52" r="14" fill="#ecd2b0" stroke="#23170f" stroke-width="2"/><path d="M65,135 L105,135 L98,72 L72,72 Z" fill="#3e5c76" stroke="#23170f" stroke-width="2"/><circle cx="85" cy="55" r="14" fill="#f2d9b8" stroke="#23170f" stroke-width="2"/></svg>`,
+        strongMan: `<svg viewBox="0 0 120 140"><path d="M18,135 L102,135 L94,62 L26,62 Z" fill="#8b5a3c" stroke="#23170f" stroke-width="2.5"/><rect x="36" y="68" width="48" height="65" fill="#4e3423" stroke="#23170f" stroke-width="2"/><circle cx="60" cy="46" r="16" fill="#e2be98" stroke="#23170f" stroke-width="2"/><path d="M46,52 Q60,72 74,52" fill="#3b2618"/></svg>`,
+        heartyWoman: `<svg viewBox="0 0 120 140"><path d="M22,135 L98,135 L86,68 L34,68 Z" fill="#8c4a32" stroke="#23170f" stroke-width="2.5"/><path d="M38,75 L82,75 L86,135 L34,135 Z" fill="#f3ead8" stroke="#23170f" stroke-width="1.8"/><circle cx="60" cy="48" r="16" fill="#f2d4b2" stroke="#23170f" stroke-width="2"/><path d="M44,40 Q60,24 76,40" fill="#f5efe2" stroke="#23170f" stroke-width="2"/></svg>`,
+        thinMan: `<svg viewBox="0 0 120 140"><path d="M40,135 L80,135 L74,64 L46,64 Z" fill="#6b5e4c" stroke="#23170f" stroke-width="2"/><circle cx="60" cy="46" r="13" fill="#ead2b5" stroke="#23170f" stroke-width="2"/><rect x="68" y="76" width="24" height="30" fill="#f5ebd4" stroke="#23170f" stroke-width="1.8"/></svg>`,
+        fatMan: `<svg viewBox="0 0 120 140"><ellipse cx="60" cy="102" rx="38" ry="34" fill="#7d6238" stroke="#23170f" stroke-width="2.5"/><circle cx="60" cy="50" r="18" fill="#efd0ae" stroke="#23170f" stroke-width="2"/><rect x="88" y="75" width="16" height="22" rx="3" fill="#c89d54" stroke="#23170f" stroke-width="2"/></svg>`,
+        catLady: `<svg viewBox="0 0 120 140"><path d="M24,135 L96,135 L84,58 L36,58 Z" fill="#5e5244" stroke="#23170f" stroke-width="2.5"/><circle cx="60" cy="52" r="15" fill="#e5ccb0" stroke="#23170f" stroke-width="2"/><polygon points="28,115 34,102 40,115" fill="#d48b45"/><circle cx="34" cy="118" r="9" fill="#d48b45" stroke="#23170f" stroke-width="1.5"/></svg>`,
+        elf: `<svg viewBox="0 0 120 140"><path d="M32,135 L88,135 L80,64 L40,64 Z" fill="#3b5e46" stroke="#23170f" stroke-width="2.2"/><polygon points="36,48 46,44 44,54" fill="#f0d5b4" stroke="#23170f" stroke-width="1.5"/><polygon points="84,48 74,44 76,54" fill="#f0d5b4" stroke="#23170f" stroke-width="1.5"/><circle cx="60" cy="48" r="15" fill="#f0d5b4" stroke="#23170f" stroke-width="2"/><path d="M92,25 Q112,75 92,125" fill="none" stroke="#5a3921" stroke-width="3"/></svg>`,
+        blackMage: `<svg viewBox="0 0 120 140"><path d="M20,135 L100,135 L88,60 L32,60 Z" fill="#232028" stroke="#0f0d12" stroke-width="2.5"/><circle cx="60" cy="50" r="16" fill="#dec7b0" stroke="#23170f" stroke-width="2"/><path d="M45,58 Q60,112 75,58 Z" fill="#18161c" stroke="#000" stroke-width="1.5"/><line x1="24" y1="18" x2="28" y2="135" stroke="#18161c" stroke-width="4"/></svg>`
+      };
+      return svgs[charKey] || svgs.blueMage;
+    }
+
     const CHARACTERS = {
-      blueMage:   { name: "Blauer Magier", color: "#2b5b84", icon: "🧙‍♂️" },
-      greyTroll:  { name: "Grauer Troll", color: "#5c6660", icon: "🧌" },
-      warrior:    { name: "Mächtiger Krieger", color: "#6e472b", icon: "⚔️" },
-      couple:     { name: "Fritz & Frida", color: "#4d6b45", icon: "👫" },
-      strongMan:  { name: "Starker Mann", color: "#703f28", icon: "🔨" },
-      heartyWoman:{ name: "Herzhafte Frau", color: "#8a4b38", icon: "🧺" },
-      thinMan:    { name: "Dünner Mann", color: "#5c5346", icon: "📜" },
-      fatMan:     { name: "Dicker Mann", color: "#7c6236", icon: "🍺" },
-      catLady:    { name: "Katzenfrau", color: "#4e463e", icon: "🐈" },
-      elf:        { name: "Elf", color: "#2e5c38", icon: "🏹" },
-      blackMage:  { name: "Schwarzbart-Magier", color: "#222026", icon: "🪄" }
-    };
-
-    const STORY_EVENTS = [
-      {
-        words: 0,
-        char: "blueMage",
-        text: "Willkommen im Verzaubertwald, {player}! Der Schwarzbart-Magier stiehlt die deutschen Hauptwörter aus dem Gedächtnis der Menschen. Jedes Wort, das du lernst, bricht seine dunkle Macht!"
-      },
-      {
-        words: 50,
-        char: "greyTroll",
-        text: "Grrr... {player}! Früher konnte ich die Bäume und Steine beim Namen nennen. Dank deiner ersten 50 Wörter kehrt meine Stimme langsam zurück."
-      },
-      {
-        words: 100,
-        char: "couple",
-        text: "Schau nur, Fritz! {player} hat schon 100 Wörter befreit! Bald können wir im Dorf wieder Lieder singen, ohne dass uns die Begriffe fehlen."
-      },
-      {
-        words: 150,
-        char: "warrior",
-        text: "Mein Schwert ist scharf, {player}, doch gegen den Sprachfluch des Schwarzbart-Magiers helfen nur deine Spruch-Karten!"
-      },
-      {
-        words: 200,
-        char: "heartyWoman",
-        text: "Komm her, {player}! Ich habe frisches Brot im Korb. Der Schwarzbart-Magier wird immer blasser, je mehr Wörter du meisterst!"
-      },
-      {
-        words: 250,
-        char: "strongMan",
-        text: "Selbst mein schwerer Schmiedehammer konnte den Fluch nicht brechen, {player}. Doch deine Worte lassen den Amboss wieder klingen!"
-      },
-      {
-        words: 300,
-        char: "thinMan",
-        text: "Ich habe es auf meiner Karte verzeichnet, {player}: Der Turm des Schwarzbart-Magiers verliert seine Schatten!"
-      },
-      {
-        words: 350,
-        char: "fatMan",
-        text: "Prost, {player}! Auf deine Wortkunst! Was nützt ein volles Wirtshaus, wenn niemand mehr die Dinge beim Namen nennen kann?"
-      },
-      {
-        words: 400,
-        char: "catLady",
-        text: "Meine Katzen schnurren wieder, {player}. Sie spüren, dass der Schwarzbart-Magier schwächer wird, weil du die Sprache mit allen teilst."
-      },
-      {
-        words: 450,
-        char: "elf",
-        text: "Die Blätter des Verzaubertwalds flüstern deinen Namen, {player}. Noch nie hat ein Fremder unsere Sprache so schnell verinnerlicht."
-      },
-      {
-        words: 500,
-        char: "blackMage",
-        text: "Unmöglich, {player}! Diese edle Sprache sollte allein uns Magiern gehören... Warum schwindet meine Kraft mit jedem Wort, das du lernst?!"
-      },
-      {
-        words: 5000,
-        char: "blackMage",
-        text: "Ich... ich habe keine Kraft mehr, {player}. Du hast alle 5000 Wörter befreit und mir dennoch das Leben geschenkt. Verzeih mir – lass uns gemeinsam im Verzaubertwald feiern!"
-      }
-    ];
-
-    /*************************************************************************
-     * 3. STARTER HIGH-FREQUENCY GERMAN NOUNS (Ordered most common -> less common)
-     * All nouns are presented in their standard Nominative singular form.
-     * Automatically loads `words_5000.json` if present in the same folder.
-     *************************************************************************/
-    let WORD_DATABASE = [
-      { rank: 1,  article: "das", noun: "Jahr",      gender: "neut", sentence: "Das neue [___] beginnt mit viel Hoffnung.", en: "The new [year] begins with much hope." },
-      { rank: 2,  article: "das", noun: "Mal",       gender: "neut", sentence: "Zum ersten [___] betrittst du den alten Wald.", en: "For the first [time] you enter the old forest." },
-      { rank: 3,  article: "das", noun: "Beispiel",  gender: "neut", sentence: "Der Magier nennt ein einfaches [___].", en: "The mage gives a simple [example]." },
-      { rank: 4,  article: "die", noun: "Zeit",      gender: "fem",  sentence: "Die [___] heilt alle Wunden im Verzaubertwald.", en: "[Time] heals all wounds in the enchanted forest." },
-      { rank: 5,  article: "die", noun: "Frau",      gender: "fem",  sentence: "Die freundliche [___] trägt einen Korb.", en: "The friendly [woman] carries a basket." },
-      { rank: 6,  article: "der", noun: "Mensch",    gender: "masc", sentence: "Jeder [___] im Dorf braucht die Sprache.", en: "Every [human/person] in the village needs language." },
-      { rank: 7,  article: "das", noun: "Kind",      gender: "neut", sentence: "Das kleine [___] lacht unter der Eiche.", en: "The little [child] laughs under the oak tree." },
-      { rank: 8,  article: "der", noun: "Tag",       gender: "masc", sentence: "Ein neuer [___] bricht über den Bäumen an.", en: "A new [day] dawns above the trees." },
-      { rank: 9,  article: "der", noun: "Mann",      gender: "masc", sentence: "Der starke [___] steht in seiner Schmiede.", en: "The strong [man] stands in his smithy." },
-      { rank: 10, article: "das", noun: "Land",      gender: "neut", sentence: "Dieses weite [___] ist voller alter Magie.", en: "This wide [land/country] is full of old magic." },
-      { rank: 11, article: "die", noun: "Frage",     gender: "fem",  sentence: "Deine kluge [___] überrascht den Magier.", en: "Your clever [question] surprises the mage." },
-      { rank: 12, article: "das", noun: "Haus",      gender: "neut", sentence: "Das alte [___] aus Holz steht am Waldrand.", en: "The old wooden [house] stands at the forest edge." },
-      { rank: 13, article: "der", noun: "Fall",      gender: "masc", sentence: "Auf jeden [___] wirst du den Zauber brechen.", en: "In any [case], you will break the spell." },
-      { rank: 14, article: "die", noun: "Arbeit",    gender: "fem",  sentence: "Nach der harten [___] ruht der Schmied.", en: "After the hard [work], the blacksmith rests." },
-      { rank: 15, article: "die", noun: "Hand",      gender: "fem",  sentence: "Die offene [___] hält zehn Spruch-Karten.", en: "The open [hand] holds ten spell cards." },
-      { rank: 16, article: "die", noun: "Stadt",     gender: "fem",  sentence: "Fern vom Wald liegt eine große [___].", en: "Far from the forest lies a large [city]." },
-      { rank: 17, article: "der", noun: "Teil",      gender: "masc", sentence: "Dieser dunkle [___] des Waldes ist geheimnisvoll.", en: "This dark [part] of the forest is mysterious." },
-      { rank: 18, article: "das", noun: "Problem",   gender: "neut", sentence: "Gemeinsam lösen wir jedes [___].", en: "Together we solve every [problem]." },
-      { rank: 19, article: "die", noun: "Welt",      gender: "fem",  sentence: "Die ganze [___] lauscht deinen Worten.", en: "The whole [world] listens to your words." },
-      { rank: 20, article: "das", noun: "Recht",     gender: "neut", sentence: "Jeder hat das [___], frei zu sprechen.", en: "Everyone has the [right] to speak freely." }
-    ];
-
-    /*************************************************************************
-     * 4. GAME STATE & SPACED REPETITION ENGINE
-     *************************************************************************/
-    let gameState = {
-      playerName: "",
-      srsData: {},         // rank -> { interval, repetitions, learned }
-      learnedWordsCount: 0,
-      storyIndex: 0
-    };
-
-    let currentHand = [];  // 10 cards per turn
-    let handIndex = 0;
-    let cardTouchState = 0; // 0 = face down, 1 = flipped (sentence), 2 = spell cast (word revealed)
-
-    // Load external 5,000 word list if present in repository
-    async function tryLoadFullDatabase() {
-      try {
-        const res = await fetch("words_5000.json");
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            WORD_DATABASE = data;
-          }
-        }
-      } catch (e) {
-        // Uses built-in starter deck when running locally without a server
-      }
-    }
-
-    function loadProgress() {
-      const saved = localStorage.getItem("spruch_save_v1");
-      if (saved) {
-        gameState = JSON.parse(saved);
-        if (gameState.playerName) {
-          document.getElementById("nameModal").classList.add("hidden");
-          initSession();
-        }
-      }
-    }
-
-    function saveProgress() {
-      localStorage.setItem("spruch_save_v1", JSON.stringify(gameState));
-    }
-
-    function startJourney() {
-      const input = document.getElementById("playerNameInput").value.trim();
-      gameState.playerName = input || "Wanderer";
-      document.getElementById("nameModal").classList.add("hidden");
-      saveProgress();
-      initSession();
-    }
-
-    function initSession() {
-      updateHUD();
-      showStoryEvent(STORY_EVENTS[0]);
-      dealNewTurnOfTenCards();
-    }
-
-    function updateHUD() {
-      document.getElementById("hudPlayerName").textContent = gameState.playerName;
-      document.getElementById("learnedCount").textContent = gameState.learnedWordsCount;
-
-      const levelIdx = Math.min(9, Math.floor(gameState.learnedWordsCount / 500));
-      document.getElementById("levelLabel").textContent = LEVEL_NAMES[levelIdx];
-
-      const progressWithinLevel = ((gameState.learnedWordsCount % 500) / 500) * 100;
-      document.getElementById("levelProgressFill").style.width = `${progressWithinLevel}%`;
-
-      const nextMilestone = (Math.floor(gameState.learnedWordsCount / 50) + 1) * 50;
-      document.getElementById("nextStoryTarget").textContent = Math.min(5000, nextMilestone);
-    }
-
-    // Select 10 cards prioritizing due SRS reviews, then unseen words in frequency order
-    function dealNewTurnOfTenCards() {
-      const now = Date.now();
-      const dueCards = [];
-      const newCards = [];
-
-      for (const word of WORD_DATABASE) {
-        const srs = gameState.srsData[word.rank];
-        if (!srs) {
-          newCards.push(word);
-        } else if (!srs.learned || srs.nextReview <= now) {
-          dueCards.push(word);
-        }
-      }
-
-      currentHand = [...dueCards, ...newCards].slice(0, 10);
-      if (currentHand.length < 10) {
-        currentHand = WORD_DATABASE.slice(0, 10);
-      }
-
-      handIndex = 0;
-      renderTenCardHandAnimation();
-      prepareCardOnStage();
-    }
-
-    function renderTenCardHandAnimation() {
-      const container = document.getElementById("tenCardContainer");
-      container.innerHTML = "";
-
-      currentHand.forEach((card, idx) => {
-        const mini = document.createElement("div");
-        mini.className = "mini-card";
-        mini.id = `mini-card-${idx}`;
-        mini.textContent = "S";
-        container.appendChild(mini);
-
-        // Dealing animation: 10 cards handed out one after another
-        setTimeout(() => {
-          mini.classList.add("dealt");
-          if (idx === handIndex) mini.classList.add("current");
-        }, idx * 90);
-      });
-    }
-
-    function updateMiniCardsHighlight() {
-      currentHand.forEach((_, idx) => {
-        const el = document.getElementById(`mini-card-${idx}`);
-        if (!el) return;
-        el.classList.remove("current", "completed");
-        if (idx < handIndex) el.classList.add("completed");
-        if (idx === handIndex) el.classList.add("current");
-      });
-    }
-
-    function prepareCardOnStage() {
-      cardTouchState = 0;
-      const cardScene = document.getElementById("activeCard");
-      cardScene.classList.remove("is-flipped");
-      document.getElementById("srsButtons").classList.remove("active");
-      document.getElementById("nounRevealBox").classList.remove("visible");
-
-      const wordObj = currentHand[handIndex];
-      if (!wordObj) return;
-
-      // Wait briefly if flipping back so content doesn't flash
-      setTimeout(() => {
-        document.getElementById("wordRank").textContent = `Wort #${wordObj.rank}`;
-
-        // Set Gender Sphere (Blue = masc, Pink = fem, Green = neut)
-        const sphere = document.getElementById("genderSphere");
-        sphere.className = "gender-sphere";
-        if (wordObj.gender === "masc") sphere.classList.add("sphere-masc");
-        else if (wordObj.gender === "fem") sphere.classList.add("sphere-fem");
-        else sphere.classList.add("sphere-neut");
-
-        // Sentence with missing word slot
-        const sentenceHTML = wordObj.sentence.replace(
-          "[___]",
-          `<span id="missingWordSlot" class="missing-slot">[ ___ ]</span>`
-        );
-        document.getElementById("sentenceDisplay").innerHTML = sentenceHTML;
-        document.getElementById("nominativeForm").textContent = `${wordObj.article} ${wordObj.noun}`;
-        document.getElementById("englishTranslation").textContent = wordObj.en;
-        document.getElementById("cardTapPrompt").textContent = "Berühre die Karte erneut für den Spruch-Zauber ✨";
-      }, 220);
-
-      updateMiniCardsHighlight();
-    }
-
-    // Two-Touch Card Interaction
-    function handleCardTouch() {
-      const wordObj = currentHand[handIndex];
-      if (!wordObj) return;
-
-      // Touch 1: Turn card facewards, revealing sentence with missing word & gender sphere
-      if (cardTouchState === 0) {
-        cardTouchState = 1;
-        document.getElementById("activeCard").classList.add("is-flipped");
-        return;
-      }
-
-      // Touch 2: Cast spell animation, reveal the missing standard noun & show SRS buttons
-      if (cardTouchState === 1) {
-        cardTouchState = 2;
-        const slot = document.getElementById("missingWordSlot");
-        if (slot) {
-          slot.textContent = wordObj.noun;
-          slot.classList.add("revealed");
-        }
-        document.getElementById("nounRevealBox").classList.add("visible");
-        document.getElementById("cardTapPrompt").textContent = "Wie gut kanntest du dieses Wort?";
-        document.getElementById("srsButtons").classList.add("active");
-      }
-    }
-
-    // Spaced Repetition Evaluation
-    function gradeCard(grade) {
-      const wordObj = currentHand[handIndex];
-      const prev = gameState.srsData[wordObj.rank] || { repetitions: 0, interval: 1, learned: false };
-
-      if (grade === 0) {
-        // Again: Re-queue in current hand so the player truly learns it this turn
-        prev.repetitions = 0;
-        prev.interval = 1;
-        currentHand.push(wordObj);
-      } else if (grade === 1) {
-        // Good
-        prev.repetitions += 1;
-        prev.interval = prev.repetitions === 1 ? 1 : prev.interval * 2;
-        if (prev.repetitions >= 2 && !prev.learned) {
-          markWordLearned(prev);
-        }
-      } else if (grade === 2) {
-        // Mastered
-        prev.repetitions += 2;
-        prev.interval = prev.interval * 3;
-        if (!prev.learned) {
-          markWordLearned(prev);
-        }
-      }
-
-      prev.nextReview = Date.now() + prev.interval * 60 * 1000;
-      gameState.srsData[wordObj.rank] = prev;
-      saveProgress();
-      updateHUD();
-
-      // Move to next card in the 10-card hand, or deal a new hand of 10
-      handIndex++;
-      if (handIndex < currentHand.length) {
-        prepareCardOnStage();
-      } else {
-        setTimeout(() => dealNewTurnOfTenCards(), 500);
-      }
-    }
-
-    function markWordLearned(srsRecord) {
-      srsRecord.learned = true;
-      gameState.learnedWordsCount += 1;
-
-      // Trigger story dialogue every 50 learned words
-      if (gameState.learnedWordsCount % 50 === 0) {
-        const milestoneEvent = STORY_EVENTS.find(e => e.words === gameState.learnedWordsCount);
-        if (milestoneEvent) {
-          showStoryEvent(milestoneEvent);
-        } else {
-          triggerNextStoryPreview();
-        }
-      }
-    }
-
-    function showStoryEvent(eventObj) {
-      const charInfo = CHARACTERS[eventObj.char];
-      const portraitEl = document.getElementById("npcPortrait");
-      portraitEl.style.background = `radial-gradient(circle, #fbf5e6 0%, ${charInfo.color}33 100%)`;
-      portraitEl.innerHTML = `<span style="font-size:2.6rem;">${charInfo.icon}</span>`;
-
-      document.getElementById("npcName").textContent = charInfo.name;
-      document.getElementById("npcDialogue").textContent = eventObj.text.replace(/\{player\}/g, gameState.playerName || "Wanderer");
-    }
-
-    function triggerNextStoryPreview() {
-      gameState.storyIndex = (gameState.storyIndex + 1) % STORY_EVENTS.length;
-      showStoryEvent(STORY_EVENTS[gameState.storyIndex]);
-    }
-
-    // Boot Game
-    tryLoadFullDatabase().then(loadProgress);
-  </script>
-</body>
-</html>
+      blueMage:    { name: "Blauer Magier",      role: "Dein Mentor im Verzaubertwald" },
+      greyTroll:   { name: "Grauer Troll",       role: "Uralter Wächter der Steine" },
+      warrior:     { name: "Mächtiger Krieger",  role: "Beschützer der Waldpfade" },
+      couple:      { name: "Fritz & Frida",      role: "Das herzliche Paar aus dem Walddorf" },
+      strongMan:   { name: "Starker Mann",       role: "Der Schmied des Verzaubertwalds" },
+      heartyWoman: { name: "Herzhafte Frau",     role: "Hüterin der Dorfküche" },
+      thinMan:     { name: "Dünner Mann",        role: "Chronist und Kartenzeichner" },
+      fatMan:      { name: "Dicker Mann",        role: "Fröhlicher Gastwirt" },
+      catLady:     { name: "Katzenfrau",         role: "Flüsterin der Waldkatzen" },
+      elf:         { name: "Elf",
